@@ -25,7 +25,6 @@ class ManualUploadForm(forms.Form):
         self.helper.label_class = 'col-lg-2'
         self.helper.field_class = 'col-lg-10'
         self.helper.form_method = 'post'
-        self.helper.form_action = reverse('view')
         self.helper.add_input(Submit('submit', 'Import', css_class='btn-success'))
         self.helper.form_class = 'form-horizontal'
         self.helper.layout = Layout(
