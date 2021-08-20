@@ -1,7 +1,80 @@
 {% extends 'bed_maker/base.html' %}
 {% block content %}
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-    <a class="navbar-brand">View variants</a>
+    <a class="navbar-brand">View transcripts</a>
     </nav>
     <br>
+
+    <table id="transcripts" class="table table-hover table-bordered">
+        <thead>
+          <tr>
+            <th>Gene</th>
+            <th>Transcript</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>MANE Transcript?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for var in transcripts %}
+          <tr>
+            <td>{{ var.display_name }}</td>
+            <td>{{ var.ensembl_transcript_id }}</td>
+            <td>{{ var.start }}</td>
+            <td>{{ var.end }}</td>
+            <td>{{ var.MANE_transcript }}</td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    
+    
+    <!-- Initialise DataTables-->
+    <script>
+        $(document).ready(function(){
+        
+         // Setup - add a text input to each footer cell
+            $('#transcripts tfoot th').each( function () {
+                var title = $(this).text();
+                $(this).html( '<input type="text" class="form-control" placeholder="Search '+title+'" />' );
+            } );
+         
+            // DataTable
+              // Inititialise DataTable
+          var table = $('#transcripts').DataTable({
+            "paging":   true,
+            "ordering": true,
+            "info":     false,
+            "pageLength": 10,
+            "searching": true,
+            "aaSorting": [],
+          });
+         
+            // Apply the search
+            table.columns().every( function () {
+                var that = this;
+         
+                $( 'input', this.footer() ).on( 'keyup change', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            } );
+        
+        
+        });
+        </script>
+
     {% endblock %}
