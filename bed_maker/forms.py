@@ -6,6 +6,7 @@ from crispy_forms.bootstrap import Field
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, HTML
 
+
 class ManualUploadForm(forms.Form):
     """
     Form for manually inputting data
@@ -14,6 +15,7 @@ class ManualUploadForm(forms.Form):
     pan_number = forms.CharField()
     date_requested = forms.DateField(widget=forms.TextInput(attrs={'type': 'date', 'style':'max-width: 12em'}))
     requested_by = forms.CharField()
+    gene_list = forms.CharField(max_length=2000, widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
         super(ManualUploadForm, self).__init__(*args, **kwargs)
@@ -32,4 +34,5 @@ class ManualUploadForm(forms.Form):
             Field('date_requested', placeholder="Enter date Panel requested" ),
             Field('requested_by', placeholder="Enter requester's name"),
             HTML('<br><h5>Ensembl Gene List</h5>'),
+            Field('gene_list', placeholder="Enter Ensembl Gene IDs beginning ENSG i.e.\nENSG00000012048\nENSG00000141510\nENSG00000146648"),
         )   
