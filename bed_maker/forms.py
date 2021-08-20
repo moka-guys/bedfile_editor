@@ -34,4 +34,5 @@ class ManualUploadForm(forms.Form):
             Field('requested_by', placeholder="Enter requester's name"),
             HTML('<br><h5>Ensembl Gene List</h5>'),
             Field('gene_list', placeholder="Enter Ensembl Gene IDs beginning ENSG i.e.\nENSG00000012048\nENSG00000141510\nENSG00000146648"),
+            HTML('<br>Sample set:<br>ENSG00000012048<br>ENSG00000141510<br>ENSG00000146648'),     
         )   
