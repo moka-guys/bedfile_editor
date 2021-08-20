@@ -15,7 +15,7 @@ class ManualUploadForm(forms.Form):
     pan_number = forms.CharField()
     date_requested = forms.DateField(widget=forms.TextInput(attrs={'type': 'date', 'style':'max-width: 12em'}))
     requested_by = forms.CharField()
-    gene_list = forms.CharField(max_length=2000, widget=forms.Textarea)
+    gene_list = forms.CharField(widget=forms.Textarea)
     
     def __init__(self, *args, **kwargs):
         super(ManualUploadForm, self).__init__(*args, **kwargs)
