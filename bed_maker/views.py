@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from .forms import ManualUploadForm
 from .models import *
 import datetime
+import ensembl_api
 
 # Create your views here.
 def home(request):
@@ -41,10 +42,22 @@ def manual_import(request):
             # Get Gene list
             gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
             for gene_ID in gene_list:
-                gene= Gene.objects.create(
+                gene = Gene.objects.create(
                 ensembl_gene_id = gene_ID,
                 bedfile_request_id = bedfile_request,
-            ) 
+                )
+                # Populate database with transcript details for each gene using Ensembl API
+                gene_object = ensembl_api.lookup_ensembl_gene(gene_ID)
+                for transcript in gene_object["Transcript"]:
+                    transcript_id = models.AutoField(primary_key=True)
+                    ensembl_transcript_id = transcript["id"]
+                    RefSeq_transcript_id = 'placeholder', # TODO: Will add this using the TARK API
+                    bedfile_request_id = bedfile_request,
+                    ensembl_gene_id = gene,
+                    display_name = transcript["display_name"],
+                    start = transcript["start"],
+                    end = transcript["end"],
+                    MANE_transcript = 'False', # TODO: Will add this using the TARK API
             
             # add success message to page
             context['message'] = ['Gene list was were uploaded successfully']
