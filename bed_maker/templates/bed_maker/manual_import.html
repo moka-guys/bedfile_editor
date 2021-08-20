@@ -1,6 +1,8 @@
 {% extends 'bed_maker/base.html' %}
 {% block content %}
+{% load crispy_forms_tags %}
+
     <p>Manually import</p>
-    {{ import_form.as_p }}
-    
+    {% crispy import_form %}
+
     {% endblock %}
