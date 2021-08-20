@@ -12,7 +12,7 @@ class ManualUploadForm(forms.Form):
     """
 
     pan_number = forms.CharField()
-    date_requested = forms.DateField()
+    date_requested = forms.DateField(widget=forms.TextInput(attrs={'type': 'date'}))
     requested_by = forms.CharField()
     
     def __init__(self, *args, **kwargs):
