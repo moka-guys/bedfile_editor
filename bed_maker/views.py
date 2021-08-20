@@ -10,9 +10,14 @@ import requests, sys
 def home(request):
     return render(request, 'bed_maker/home.html', {})
 
-
 def view(request):
-    return render(request, 'bed_maker/view.html', {})
+    """
+    View a list of transcripts
+    """
+    transcript_list = Transcript.objects.all()
+
+    return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
+    
 
 def lookup_ensembl_gene(ensembl_gene_id):
     server = "https://rest.ensembl.org"

@@ -5,6 +5,16 @@
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand">Manual import</a>
   </nav>
+  <br/>
+
+  <!-- Success message after import -->
+  {% if message %}
+    {% for m in message %}
+      <div class="alert alert-success">
+        <strong>Success!</strong> {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
 
     {% crispy import_form %}
 
