@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from .forms import ManualUploadForm
 from .models import *
 import datetime
-import ensembl_api
+import requests, sys
 
 # Create your views here.
 def home(request):
@@ -14,6 +14,19 @@ def home(request):
 def view(request):
     return render(request, 'bed_maker/view.html', {})
 
+def lookup_ensembl_gene(ensembl_gene_id):
+    server = "https://rest.ensembl.org"
+
+    ext = f"/lookup/id/{ensembl_gene_id}?expand=1&utr=1"
+    
+    r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
+    
+    if not r.ok:
+        r.raise_for_status()
+        sys.exit()
+    
+    decoded = r.json()
+    return(decoded)
 
 def manual_import(request):
     """
@@ -47,7 +60,7 @@ def manual_import(request):
                 bedfile_request_id = bedfile_request,
                 )
                 # Populate database with transcript details for each gene using Ensembl API
-                gene_object = ensembl_api.lookup_ensembl_gene(gene_ID)
+                gene_object = lookup_ensembl_gene(gene_ID)
                 for transcript in gene_object["Transcript"]:
                     transcript_id = models.AutoField(primary_key=True)
                     ensembl_transcript_id = transcript["id"]
