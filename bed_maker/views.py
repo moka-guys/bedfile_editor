@@ -12,4 +12,4 @@ def view(request):
 
 
 def manual_import(request):
-    return render(request, 'bed_maker/manual_enter_region.html', {})
+    return render(request, 'bed_maker/manual_import.html', {})

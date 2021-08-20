@@ -18,5 +18,5 @@ class Gene(models.Model):
     """
     gene_id = models.AutoField(primary_key=True)
     # ensembl gene ID begining ENSG
-    ensembl_gene_id = models.CharField(max_length=15, primary_key=True)
+    ensembl_gene_id = models.CharField(max_length=15)
     bedfile_request_id = models.ForeignKey('Gene', on_delete=models.CASCADE)
