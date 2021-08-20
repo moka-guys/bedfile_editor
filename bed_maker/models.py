@@ -9,6 +9,7 @@ class BedfileRequest(models.Model):
     bedfile_request_id = models.AutoField(primary_key=True)
     pan_number = models.CharField(max_length=10)
     date_requested = models.DateField()
+    requested_by = models.CharField(max_length=20)
     request_status = models.CharField(max_length=10, choices=(('draft', 'draft'), ('published', 'published')))
 
 
