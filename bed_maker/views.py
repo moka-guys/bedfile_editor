@@ -15,11 +15,15 @@ def view(request):
 
 
 def manual_import(request):
+    """
+    Takes the input from the manual input form and imports it into the database
+    """
+    # setup view
     import_form = ManualUploadForm()
 
     context = {'import_form': import_form,}
     
-
+    # if form is submitted
     if request.method == 'POST':
 
         import_form = ManualUploadForm(request.POST)
@@ -42,5 +46,8 @@ def manual_import(request):
                 bedfile_request_id = bedfile_request,
             ) 
             
-    
+            # add success message to page
+            context['message'] = ['Gene list was were uploaded successfully']
+
+    # render the page
     return render(request, 'bed_maker/manual_import.html', context)
