@@ -28,8 +28,8 @@ class ManualUploadForm(forms.Form):
         self.helper.form_class = 'form-horizontal'
         self.helper.layout = Layout(
             HTML('<br><h5>Bedfile Request</h5>'),
-            Field('pan_number'),
-            Field('date_requested'),
-            Field('requested_by'),
+            Field('pan_number', placeholder="Enter new Pan number for this panel"),
+            Field('date_requested', placeholder="Enter date Panel requested" ),
+            Field('requested_by', placeholder="Enter requester's name"),
             HTML('<br><h5>Ensembl Gene List</h5>'),
         )   
