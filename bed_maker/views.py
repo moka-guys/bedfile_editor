@@ -61,17 +61,17 @@ def manual_import(request):
                 )
                 # Populate database with transcript details for each gene using Ensembl API
                 gene_object = lookup_ensembl_gene(gene_ID)
-                for transcript in gene_object["Transcript"]:
-                    transcript_id = models.AutoField(primary_key=True)
-                    ensembl_transcript_id = transcript["id"]
+                for transcript_dict in gene_object["Transcript"]:
+                    transcript = Transcript.objects.create(
+                    ensembl_transcript_id = transcript_dict["id"],
                     RefSeq_transcript_id = 'placeholder', # TODO: Will add this using the TARK API
                     bedfile_request_id = bedfile_request,
-                    ensembl_gene_id = gene,
-                    display_name = transcript["display_name"],
-                    start = transcript["start"],
-                    end = transcript["end"],
+                    gene_id = gene,
+                    display_name = transcript_dict["display_name"],
+                    start = transcript_dict["start"],
+                    end = transcript_dict["end"],
                     MANE_transcript = 'False', # TODO: Will add this using the TARK API
-            
+                    )
             # add success message to page
             context['message'] = ['Gene list was were uploaded successfully']
 
