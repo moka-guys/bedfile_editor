@@ -32,7 +32,7 @@ class Transcript(models.Model):
     # RefSeq transcript ID begining NM
     RefSeq_transcript_id = models.CharField(max_length=15)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
-    ensembl_gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE)
+    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=15)
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
