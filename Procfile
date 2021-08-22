@@ -1,1 +1,1 @@
-web: gunicorn BEDFILE_EDITOR.wsgi --log-file -
+web: gunicorn config.wsgi --log-file -
