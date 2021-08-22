@@ -5,6 +5,7 @@ from .forms import ManualUploadForm
 from .models import *
 import datetime
 import requests, sys
+import pandas as pd
 
 # Create your views here.
 def home(request):
@@ -17,7 +18,23 @@ def view(request):
     transcript_list = Transcript.objects.all()
 
     return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
+
+def get_MANE_list():
+    server = "http://dev-tark.ensembl.org"
+
+    ext = f"/api/transcript/manelist/"
     
+    r = requests.get(server+ext, headers={ "Content-Type" : "text/html"})
+    
+    if not r.ok:
+        r.raise_for_status()
+        sys.exit()
+    
+    decoded = r.json()
+    # ens_stable_id, ens_stable_id_version, refseq_stable_id, refseq_stable_id_version, mane_type, ens_gene_name
+    MANE_list_df = pd.DataFrame(decoded) 
+    
+    return(MANE_list_df)  
 
 def lookup_ensembl_gene(ensembl_gene_id):
     server = "https://rest.ensembl.org"
@@ -56,7 +73,12 @@ def manual_import(request):
                 date_requested = cleaned_data['date_requested'],
                 requested_by = cleaned_data['requested_by'],
                 request_status = 'draft',
-            ) 
+            )
+
+            # Use the TARK API to get most recent version of the MANE transcript list
+
+            MANE_list_df = get_MANE_list()
+
             # Get Gene list
             gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
             for gene_ID in gene_list:
@@ -67,18 +89,24 @@ def manual_import(request):
                 # Populate database with transcript details for each gene using Ensembl API
                 gene_object = lookup_ensembl_gene(gene_ID)
                 for transcript_dict in gene_object["Transcript"]:
+                    if transcript_dict["id"] in MANE_list_df.ens_stable_id.values:
+                        MANE_transcript = 'True'
+                        RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript_dict["id"]]['refseq_stable_id'].item()
+                    else:
+                        MANE_transcript = 'False'
+                        RefSeq_transcript_id = ''
                     transcript = Transcript.objects.create(
                     ensembl_transcript_id = transcript_dict["id"],
-                    RefSeq_transcript_id = 'placeholder', # TODO: Will add this using the TARK API
                     bedfile_request_id = bedfile_request,
                     gene_id = gene,
                     display_name = transcript_dict["display_name"],
                     start = transcript_dict["start"],
                     end = transcript_dict["end"],
-                    MANE_transcript = 'False', # TODO: Will add this using the TARK API
+                    MANE_transcript = MANE_transcript,
+                    RefSeq_transcript_id = RefSeq_transcript_id
                     )
             # add success message to page
-            context['message'] = ['Gene list was were uploaded successfully']
+            context['message'] = ['Gene list was uploaded successfully']
 
     # render the page
     return render(request, 'bed_maker/manual_import.html', context)
