@@ -22,8 +22,8 @@ class ManualUploadForm(forms.Form):
 
         self.helper = FormHelper()
         self.helper.form_id = 'manual-upload-form'
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-10'
+        self.helper.label_class = 'col-lg-2' # Set from Crispy Form Template 
+        self.helper.field_class = 'col-lg-10' # Set from Crispy Form Template 
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Import', css_class='btn-success'))
         self.helper.form_class = 'form-horizontal'
