@@ -38,6 +38,7 @@ def get_MANE_list():
     
     r = requests.get(server+ext, headers={ "Content-Type" : "text/html"})
     
+    # Send informative error message if bad request returned 
     if not r.ok:
         r.raise_for_status()
         sys.exit()
@@ -58,6 +59,7 @@ def lookup_ensembl_gene(ensembl_gene_id):
     
     r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
     
+    # Send informative error message if bad request returned 
     if not r.ok:
         r.raise_for_status()
         sys.exit()
