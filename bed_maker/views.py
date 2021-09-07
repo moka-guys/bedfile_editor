@@ -20,6 +20,18 @@ def view(request):
     return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
 
 def get_MANE_list():
+    '''
+    Get a JSON of MANE transcripts via the TARK API and return it as a Pandas Dataframe.
+    MANE transcripts are minimal set of matching RefSeq and Ensembl transcripts of human
+    protein-coding genes, where the transcripts from a matched pair are identical
+    (5’ UTR, coding region and 3’ UTR), but retain their respective identifiers.
+
+    The MANE transcript set is classified into two groups:
+
+    1) MANE Select: One high-quality representative transcript per protein-coding gene that is well-supported by 
+    experimental data and represents the biology of the gene.
+    2) MANE Plus Clinical: Transcripts chosen to supplement MANE Select when needed for clinical variant reporting.
+    '''
     server = "http://dev-tark.ensembl.org"
 
     ext = f"/api/transcript/manelist/"
@@ -37,6 +49,9 @@ def get_MANE_list():
     return(MANE_list_df)  
 
 def lookup_ensembl_gene(ensembl_gene_id):
+    '''
+    Get transcripts related to Ensembl Gene ID from the Ensembl REST API
+    '''
     server = "https://rest.ensembl.org"
 
     ext = f"/lookup/id/{ensembl_gene_id}?expand=1&utr=1"
