@@ -84,7 +84,8 @@ def manual_import(request):
             print(import_form)
             cleaned_data = import_form.cleaned_data
 
-           # get bedfile request data
+           # get bedfile request data - BedfileRequest is created when the users fills in
+           # the Import details in the webapp creating a BedfileRequest object which is defined in models.py
             bedfile_request, created = BedfileRequest.objects.get_or_create(
                 pan_number = cleaned_data['pan_number'],
                 date_requested = cleaned_data['date_requested'],
@@ -96,7 +97,9 @@ def manual_import(request):
 
             MANE_list_df = get_MANE_list()
 
-            # Get Gene list
+            # Get Gene list - Gene objects is defined in models.py - it populates the data into the 
+            # genes table for every BedfileRequest made.
+            # List comprehension to split lines input by user into a list and trim any white space
             gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
             for gene_ID in gene_list:
                 gene = Gene.objects.create(
@@ -106,6 +109,8 @@ def manual_import(request):
                 # Populate database with transcript details for each gene using Ensembl API
                 gene_object = lookup_ensembl_gene(gene_ID)
                 for transcript_dict in gene_object["Transcript"]:
+                    # check if the Transcript ID is present in a list of all MANE transcripts, if it does it allocates True to the field MANE_transcript 
+                    # and adds the appropriate RefSeq ID to the field
                     if transcript_dict["id"] in MANE_list_df.ens_stable_id.values:
                         MANE_transcript = 'True'
                         RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript_dict["id"]]['refseq_stable_id'].item()
