@@ -46,13 +46,13 @@ class SignUpForm(UserCreationForm):
     email                   = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
 
     class Meta:
-        model = User
+        model = Profile
         fields = ('email', 'password1', 'password2', )
     
     def clean_email(self):
 	    email = self.cleaned_data['email'].lower()
 	    try:
-		    account = User.objects.exclude(pk=self.instance.pk).get(email=email)
+		    account = Profile.objects.exclude(pk=self.instance.pk).get(email=email)
 	    except User.DoesNotExist:
 		    return email
 	    raise forms.ValidationError('Email "%s" is already in use.' % account)

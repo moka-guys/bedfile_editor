@@ -133,5 +133,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = str(os.path.join(BASE_DIR, 'sent_emails'))
 
+AUTH_USER_MODEL = 'bed_maker.Profile'
+AUTHENTICATION_BACKENDS = ( 
+    'django.contrib.auth.backends.AllowAllUsersModelBackend', 
+    #'accounts.backends.CaseInsensitiveModelBackend',
+    )

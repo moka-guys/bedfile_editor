@@ -37,11 +37,10 @@
 		  <div class="card-body">
 		    <form class="form-signin" method="post">{% csrf_token %}
 				<div class="d-flex flex-column pb-3">
-				<img class="img-fluid mx-auto d-block" src="{% static 'logo.jpg' %}" alt="codingwithmitch logo" width="72" height="72">
+				<img class="img-fluid mx-auto d-block" src="{% static 'logo.jpg' %}" alt="logo" width="72" height="72">
 				</div>
 				<input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
 
-				<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required>
 
 				<input type="password" name="password1" id="inputPassword1" class="form-control" placeholder="Password" required>
 
@@ -74,7 +73,7 @@
             </div>
 
             <div class="btn-group dropleft">
-              <img class="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{request.user.profile_image.url}}" alt="codingwithmitch logo" width="40" height="40">
+              <img class="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{request.user.profile_image.url}}" alt="logo" width="40" height="40">
               <div class="dropdown-menu" aria-labelledby="id_profile_links">
                 <a class="dropdown-item" href="#">Account</a>
                 <a class="dropdown-item" href="#">Logout</a>
@@ -85,7 +84,7 @@
         </div>
       {% else %}
         <a class="p-2 text-dark" href="#">Login</a>
-        <a class="btn btn-outline-primary" href="{% url 'signup' %}">SIGNUP</a>
+        <a class="btn btn-outline-primary" href="{% url 'signup' %}">SIGN UP</a>
       {% endif %}
 				{% endfor %}
 				</p>
@@ -97,7 +96,7 @@
 
 				{% endif %}
 
-				<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+				<button class="btn btn-lg btn-primary btn-block" type="submit">SIGN UP</button>
 
 				</form>
 		  </div>
