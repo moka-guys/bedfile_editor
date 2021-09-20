@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -37,3 +40,21 @@ class Transcript(models.Model):
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
+
+class Profile(models.Model):
+    user                    = models.OneToOneField(User, on_delete=models.CASCADE)
+    email_confirmed         = models.BooleanField(default=False)
+    email 					= models.EmailField(verbose_name="email", max_length=60, unique=True)
+    date_joined				= models.DateTimeField(verbose_name='date joined', auto_now_add=True)
+    last_login				= models.DateTimeField(verbose_name='last login', auto_now=True)
+    is_admin				= models.BooleanField(default=False)
+    is_active				= models.BooleanField(default=True)
+    is_staff				= models.BooleanField(default=False)
+    is_superuser			= models.BooleanField(default=False)
+    # other fields...
+
+@receiver(post_save, sender=User)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()

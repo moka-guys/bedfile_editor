@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from .forms import ManualUploadForm
@@ -6,6 +6,16 @@ from .models import *
 import datetime
 import requests, sys
 import pandas as pd
+
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.template.loader import render_to_string
+from bed_maker.forms import SignUpForm, AccountAuthenticationForm
+from bed_maker.tockens import account_activation_token
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth import login, logout
 
 # Create your views here.
 def home(request):
@@ -132,3 +142,88 @@ def manual_import(request):
 
     # render the page
     return render(request, 'bed_maker/manual_import.html', context)
+
+
+def signup(request):
+    if request.method == 'POST':
+        signup_form = SignUpForm(request.POST)
+        if signup_form.is_valid():
+            user = signup_form.save(commit=False)
+            user.is_active = False
+            user.save()
+            current_site = get_current_site(request)
+            subject = 'Activate Your MySite Account'
+            message = render_to_string('account_activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            user.email_user(subject, message)
+            return redirect('account_activation_sent')
+    else:
+        signup_form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.profile.email_confirmed = True
+        user.save()
+        login(request, user)
+        return redirect('home')
+    else:
+        return render(request, 'account_activation_invalid.html')
+
+def account_activation_sent(request):
+    return render(request, 'account_activation_sent.html')
+
+def logout_view(request):
+	logout(request)
+	return redirect("home")
+
+
+def login_view(request, *args, **kwargs):
+	context = {}
+
+	user = request.user
+	if user.is_authenticated: 
+		return redirect("bed_maker/home")
+
+	destination = get_redirect_if_exists(request)
+	print("destination: " + str(destination))
+
+	if request.POST:
+		form = AccountAuthenticationForm(request.POST)
+		if form.is_valid():
+			email = request.POST['email']
+			password = request.POST['password']
+			user = authenticate(email=email, password=password)
+
+			if user:
+				login(request, user)
+				if destination:
+					return redirect(destination)
+				return redirect("bed_maker/home")
+
+	else:
+		form = AccountAuthenticationForm()
+
+	context['login_form'] = form
+
+	return render(request, "registration/login.html", context)
+
+def get_redirect_if_exists(request):
+	redirect = None
+	if request.GET:
+		if request.GET.get("next"):
+			redirect = str(request.GET.get("next"))
+	return redirect
+
+

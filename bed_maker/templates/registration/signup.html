@@ -1,0 +1,110 @@
+<!-- templates/registration/signup.html -->
+{% extends 'bed_maker/base.html' %}
+{% load static %}
+{% block content %}
+
+<style type="text/css">
+
+  .card-signin {
+	  width: 100%;
+	  max-width: 400px;
+	  padding: 15px;
+	  margin: auto;
+  }
+  
+  .form-signin input[type="email"] {
+    margin-bottom: 10px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .form-signin input[type="text"] {
+    margin-bottom: 10px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .form-signin input[type="password"] {
+    margin-bottom: -1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+
+</style>
+
+<div class="container-fluid">
+	<div class="row justify-content-center">
+		<div class="card card-signin">
+		  <div class="card-body">
+		    <form class="form-signin" method="post">{% csrf_token %}
+				<div class="d-flex flex-column pb-3">
+				<img class="img-fluid mx-auto d-block" src="{% static 'logo.jpg' %}" alt="codingwithmitch logo" width="72" height="72">
+				</div>
+				<input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+
+				<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required>
+
+				<input type="password" name="password1" id="inputPassword1" class="form-control" placeholder="Password" required>
+
+				<input type="password" name="password2" id="inputPassword2" class="form-control" placeholder="Confirm password" required>
+
+				{% for field in signup_form %}
+				<p>
+				{% for error in field.errors %}
+				<p style="color: red">{{ error }}</p>{% if request.user.is_authenticated %}
+        <div class="dropdown dropleft show p-2">
+          <div class="d-flex flex-row">
+
+            <div class="btn-group dropleft">
+              <div class="d-flex notifications-icon-container rounded-circle align-items-center mr-3" id="id_chat_notification_dropdown_toggle" data-toggle="dropdown">
+                <span id="id_chat_notifications_count" class="notify-badge"></span>
+                <span class="d-flex material-icons notifications-material-icon m-auto align-items-center">chat</span>
+                <div class="dropdown-menu scrollable-menu" aria-labelledby="id_chat_notification_dropdown_toggle" id="id_chat_notifications_container">
+                    
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group dropleft">
+              <div class="d-flex notifications-icon-container rounded-circle align-items-center mr-3" id="id_notification_dropdown_toggle" data-toggle="dropdown" onclick="setGeneralNotificationsAsRead()">
+                <span id="id_general_notifications_count" class="notify-badge"></span>
+                <span class="d-flex material-icons notifications-material-icon m-auto align-items-center">notifications</span>
+                <div class="dropdown-menu scrollable-menu" aria-labelledby="id_notification_dropdown_toggle" id="id_general_notifications_container">										
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group dropleft">
+              <img class="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{{request.user.profile_image.url}}" alt="codingwithmitch logo" width="40" height="40">
+              <div class="dropdown-menu" aria-labelledby="id_profile_links">
+                <a class="dropdown-item" href="#">Account</a>
+                <a class="dropdown-item" href="#">Logout</a>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      {% else %}
+        <a class="p-2 text-dark" href="#">Login</a>
+        <a class="btn btn-outline-primary" href="{% url 'signup' %}">SIGNUP</a>
+      {% endif %}
+				{% endfor %}
+				</p>
+				{% endfor %}
+				{% if signup_form.non_field_errors %}
+				<div style="color: red">
+					<p>{{signup_form.non_field_errors}}</p>
+				</div>
+
+				{% endif %}
+
+				<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+
+				</form>
+		  </div>
+		</div>
+		
+	</div>
+</div>
+
+
+{% endblock content %}
