@@ -15,7 +15,8 @@ from bed_maker.tockens import account_activation_token
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, authenticate, logout
+from django.core.mail import send_mail
 
 # Create your views here.
 def home(request):
@@ -152,32 +153,34 @@ def signup(request):
             user.is_active = False
             user.save()
             current_site = get_current_site(request)
-            subject = 'Activate Your MySite Account'
+            subject = 'Activate Your BED MAKER Account'
             message = render_to_string('registration/account_activation_email.html', {
                 'user': user,
                 'domain': current_site.domain,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             })
-            user.email_user(subject, message)
-            return redirect('account_activation_sent')
+            email = signup_form.cleaned_data.get('email').lower()
+            send_mail(subject, message, 'bed_maker@admin.com', [email])
+            return redirect('registration/account_activation_sent')
     else:
         signup_form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': signup_form})
 
 def activate(request, uidb64, token):
+
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = Profile.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Profile.DoesNotExist):
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
-        user.profile.email_confirmed = True
+        user.email_confirmed = True
         user.save()
         login(request, user)
-        return redirect('home')
+        return redirect('bed_maker/home')
     else:
         return render(request, 'account_activation_invalid.html')
 

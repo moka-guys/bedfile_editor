@@ -135,6 +135,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = str(os.path.join(BASE_DIR, 'sent_emails'))
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL = 'bed_maker.Profile'
 AUTHENTICATION_BACKENDS = ( 

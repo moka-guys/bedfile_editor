@@ -48,7 +48,7 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = Profile
         fields = ('email', 'password1', 'password2', )
-    
+    '''
     def clean_email(self):
 	    email = self.cleaned_data['email'].lower()
 	    try:
@@ -56,7 +56,7 @@ class SignUpForm(UserCreationForm):
 	    except User.DoesNotExist:
 		    return email
 	    raise forms.ValidationError('Email "%s" is already in use.' % account)
-
+    '''
 class AccountAuthenticationForm(forms.ModelForm):
 
 	password = forms.CharField(label='Password', widget=forms.PasswordInput)

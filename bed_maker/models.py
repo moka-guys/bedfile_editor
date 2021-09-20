@@ -1,9 +1,10 @@
-#from _typeshed import Self
+
 from django.db import models
-from django.contrib.auth.models import User
+from django.db.models.deletion import SET_DEFAULT
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import User
 # Create your models here.
 
 class BedfileRequest(models.Model):
@@ -65,6 +66,7 @@ class MyAccountManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.is_active = True
         user.save(using=self._db)
         return user
 
@@ -73,16 +75,15 @@ def get_default_profile_image():
 
 class Profile(AbstractBaseUser):
     email 					= models.EmailField(verbose_name="email", max_length=60, unique=True)
-
     date_joined				= models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login				= models.DateTimeField(verbose_name='last login', auto_now=True)
     is_admin				= models.BooleanField(default=False)
-    is_active				= models.BooleanField(default=True)
+    is_active				= models.BooleanField(default=False)
     is_staff				= models.BooleanField(default=False)
     is_superuser			= models.BooleanField(default=False)
     profile_image			= models.ImageField(max_length=255, null=True, blank=True, default=get_default_profile_image)
     hide_email				= models.BooleanField(default=True)
-    
+    email_confirmed         = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -105,7 +106,7 @@ class Profile(AbstractBaseUser):
 
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=MyAccountManager)
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
