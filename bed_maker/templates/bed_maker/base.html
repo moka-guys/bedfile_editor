@@ -38,9 +38,76 @@
             <a class="nav-link" href="{% url 'view' %}">View</a>
           </li>
         </ul>
+        <ul class="nav navbar-nav navbar-right">
+         
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Account <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              {% if request.user.is_authenticated %}
+
+                      <li></li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                      <li></li><a class="dropdown-item" href="{% url 'password_change' %}">Change Password</a></li>
+                   
+              {% else %}
+                      <li role="separator" class="divider"></li>
+                      <li><a class="p-2 text-dark" href="{% url 'login' %}">Login</a></li>
+                      <li><a class="p-2 text-dark" href="{% url 'password_reset' %}">Reset Password</a></li> 
+                      <li role="separator" class="divider"></li>
+                      <li><a class="btn btn-outline-primary m-2" href="{% url 'signup' %}">REGISTER</a></li>
+              {% endif %}	
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+             
+            </ul>
+          </li>
+        </ul>
+        <nav class="navbar navbar-default">
+          <div class="container-fluid"></div>
+         
+              <a class="navbar-brand">
+                <img alt="Logo" src="{% static 'logo2.jpg' %}" width="40" height="40">
+              </a>
+           
+          </div>
+        </nav>
+
       </div>
     </nav>
     <br>
+
+    <!-- SMALL SCREENS -->
+	<div class="d-flex d-md-none flex-column my-auto align-items-center">
+		<h5 class="font-weight-normal">
+		<a class="p-2 text-dark" href="{% url 'home' %}">Home</a>
+		</h5>
+		<form class="search-bar justify-content-start" >
+			<input type="text" class="form-control" name="q" id="id_q_small" placeholder="Search...">
+		</form>
+		<div class="d-flex flex-row-reverse flex-grow-1">
+			<nav class="">
+				{% if request.user.is_authenticated %}
+				<div class="dropdown dropleft p-2 mt-2">
+					<div class="d-flex flex-row">
+						<div class="btn-group dropleft">
+							<img class="account-image rounded-circle m-auto d-block dropdown-toggle" id="id_profile_links" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="{% static 'codingwithmitch/dummy_image.png' %}" alt="codingwithmitch logo" width="40" height="40">
+							<div class="dropdown-menu" aria-labelledby="id_profile_links">
+								<a class="dropdown-item" href="#">Account</a>
+								<a class="dropdown-item" href="#">Logout</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% else %}
+					<a class="p-2 text-dark" href="#">Login</a>
+					<a class="btn btn-outline-primary m-2" href="#">SIGN UP</a>
+				{% endif %}	
+			</nav>
+	  	</div>
+	</div>
+	<!-- END SMALL SCREENS -->
 
     <div class="container">
       <!-- Content here -->

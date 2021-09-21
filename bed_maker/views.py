@@ -16,7 +16,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import login, authenticate, logout
-from django.core.mail import send_mail
+from django.core.mail import send_mail, BadHeaderError
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
+from django.db.models.query_utils import Q
 
 # Create your views here.
 def home(request):
@@ -162,7 +165,7 @@ def signup(request):
             })
             email = signup_form.cleaned_data.get('email').lower()
             send_mail(subject, message, 'bed_maker@admin.com', [email])
-            return redirect('registration/account_activation_sent')
+            return redirect('account_activation_sent')
     else:
         signup_form = SignUpForm()
     return render(request, 'registration/signup.html', {'form': signup_form})
@@ -182,10 +185,10 @@ def activate(request, uidb64, token):
         login(request, user)
         return redirect('bed_maker/home')
     else:
-        return render(request, 'account_activation_invalid.html')
+        return render(request, 'registration/account_activation_invalid.html')
 
 def account_activation_sent(request):
-    return render(request, 'account_activation_sent.html')
+    return render(request, 'registration/account_activation_sent.html')
 
 def logout_view(request):
 	logout(request)
@@ -197,7 +200,7 @@ def login_view(request, *args, **kwargs):
 
 	user = request.user
 	if user.is_authenticated: 
-		return redirect("bed_maker/home")
+		return redirect("home")
 
 	destination = get_redirect_if_exists(request)
 	print("destination: " + str(destination))
@@ -213,7 +216,7 @@ def login_view(request, *args, **kwargs):
 				login(request, user)
 				if destination:
 					return redirect(destination)
-				return redirect("bed_maker/home")
+				return redirect("home")
 
 	else:
 		form = AccountAuthenticationForm()
@@ -228,5 +231,33 @@ def get_redirect_if_exists(request):
 		if request.GET.get("next"):
 			redirect = str(request.GET.get("next"))
 	return redirect
+
+def password_reset_request(request):
+	if request.method == "POST":
+		password_reset_form = PasswordResetForm(request.POST)
+		if password_reset_form.is_valid():
+			data = password_reset_form.cleaned_data['email']
+			associated_users = Profile.objects.filter(Q(email=data))
+			if associated_users.exists():
+				for user in associated_users:
+					subject = "Password Reset Requested"
+					email_template_name = "registration/password_reset_email.txt"
+					c = {
+					"email":user.email,
+					'domain':'127.0.0.1:8000',
+					'site_name': 'Website',
+					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
+					"user": user,
+					'token': default_token_generator.make_token(user),
+					'protocol': 'http',
+					}
+					email = render_to_string(email_template_name, c)
+					try:
+						send_mail(subject, email, 'admin@example.com' , [user.email], fail_silently=False)
+					except BadHeaderError:
+						return HttpResponse('Invalid header found.')
+					return redirect ("/password_reset/done/")
+	password_reset_form = PasswordResetForm()
+	return render(request=request, template_name="registration/password_reset_table.html", context={"password_reset_form":password_reset_form})
 
 

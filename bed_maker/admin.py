@@ -9,7 +9,7 @@ admin.site.register(Transcript)
 
 class AccountAdmin(UserAdmin):
     ordering = ('email',)
-    list_display = ('email','date_joined', 'last_login', 'is_admin','is_staff')
+    list_display = ('email','date_joined', 'last_login', 'is_admin','is_staff', 'is_active', 'is_superuser', 'email_confirmed')
     search_fields = ('email',)
     readonly_fields=('id', 'date_joined', 'last_login')
 
