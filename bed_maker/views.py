@@ -183,7 +183,7 @@ def activate(request, uidb64, token):
         user.email_confirmed = True
         user.save()
         login(request, user)
-        return redirect('bed_maker/home')
+        return redirect('home')
     else:
         return render(request, 'registration/account_activation_invalid.html')
 
@@ -196,34 +196,37 @@ def logout_view(request):
 
 
 def login_view(request, *args, **kwargs):
-	context = {}
+    context = {}
 
-	user = request.user
-	if user.is_authenticated: 
-		return redirect("home")
+    user = request.user
+    if user.is_authenticated: 
+        return redirect("home")
 
-	destination = get_redirect_if_exists(request)
-	print("destination: " + str(destination))
+    destination = get_redirect_if_exists(request)
+    print("destination: " + str(destination))
 
-	if request.POST:
-		form = AccountAuthenticationForm(request.POST)
-		if form.is_valid():
-			email = request.POST['email']
-			password = request.POST['password']
-			user = authenticate(email=email, password=password)
+    if request.POST:
+        form = AccountAuthenticationForm(request.POST)
+        if form.is_valid():
+            email = request.POST['email']
+            password = request.POST['password']
+            user = authenticate(email=email, password=password)
+            if user.is_active:
+                login(request, user)
+                if destination:
+                    return redirect(destination)
+                return redirect("home")
+            else:
+                return redirect('account_not_activated')	
+        else:
+            return redirect('account_activation_sent')
+				
+    else:
+        form = AccountAuthenticationForm()
 
-			if user:
-				login(request, user)
-				if destination:
-					return redirect(destination)
-				return redirect("home")
+    context['login_form'] = form
 
-	else:
-		form = AccountAuthenticationForm()
-
-	context['login_form'] = form
-
-	return render(request, "registration/login.html", context)
+    return render(request, "registration/login.html", context)
 
 def get_redirect_if_exists(request):
 	redirect = None

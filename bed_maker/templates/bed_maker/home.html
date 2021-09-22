@@ -4,4 +4,12 @@
     <a class="navbar-brand">Homepage</a>
     </nav>
     <br>
-    {% endblock %}
+{% if request.user.is_authenticated %}
+
+
+{% else %}
+<p>You are not authorised to view this page. Please login!</p>
+<a class="btn btn-outline-primary m-2"  href="{% url 'login' %}">Login</a>
+{% endif %}	
+
+{% endblock %}

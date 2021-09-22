@@ -1,5 +1,6 @@
 {% extends 'bed_maker/base.html' %}
 {% block content %}
+{% if request.user.is_authenticated %}
 {% load crispy_forms_tags %}
 
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
@@ -18,4 +19,8 @@
 
     {% crispy import_form %}
 
-    {% endblock %}
+{% else %}
+<p>You are not authorised to view this page. Please login!</p>
+<a class="btn btn-outline-primary m-2"  href="{% url 'login' %}">Login</a>
+{% endif %}	
+{% endblock %}

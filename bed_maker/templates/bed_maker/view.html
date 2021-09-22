@@ -1,5 +1,6 @@
 {% extends 'bed_maker/base.html' %}
 {% block content %}
+{% if request.user.is_authenticated %}
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand">View transcripts</a>
     </nav>
@@ -79,5 +80,8 @@
         
         });
         </script>
-
-    {% endblock %}
+ {% else %}
+<p>You are not authorised to view this page. Please login!</p>
+<a class="btn btn-outline-primary m-2"  href="{% url 'login' %}">Login</a>
+{% endif %}	
+{% endblock %}

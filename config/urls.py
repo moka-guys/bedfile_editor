@@ -50,6 +50,9 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_completed.html'),
      name='password_reset_complete'),
 
+    path('login/not_activated/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/account_not_activated.html'),
+     name='account_not_activated'),
+
 ]
 
 '''
