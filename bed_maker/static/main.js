@@ -1,11 +1,3 @@
-console.log("Hello World")
-
-const spinnerCircle = document.getElementById('spinner-circle')
-const dataBox = document.getElementById('data-box')
-
-console.log('spinner-circle')
-console.log('data-box')
-
 
 $(document).ready(function() {
 
