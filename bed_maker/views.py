@@ -20,6 +20,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query_utils import Q
+from django.http import JsonResponse
 
 # Create your views here.
 def home(request):
@@ -88,6 +89,8 @@ def manual_import(request):
     # setup view
     import_form = ManualUploadForm()
 
+ 
+
     context = {'import_form': import_form,}
     
     # if form is submitted
@@ -103,7 +106,7 @@ def manual_import(request):
             bedfile_request, created = BedfileRequest.objects.get_or_create(
                 pan_number = cleaned_data['pan_number'],
                 date_requested = cleaned_data['date_requested'],
-                requested_by = cleaned_data['requested_by'],
+                requested_by = request.user.email,
                 request_status = 'draft',
             )
 
@@ -262,5 +265,6 @@ def password_reset_request(request):
 					return redirect ("/password_reset/done/")
 	password_reset_form = PasswordResetForm()
 	return render(request=request, template_name="registration/password_reset_table.html", context={"password_reset_form":password_reset_form})
+
 
 

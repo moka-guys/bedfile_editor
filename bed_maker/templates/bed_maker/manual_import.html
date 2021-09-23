@@ -3,11 +3,15 @@
 {% if request.user.is_authenticated %}
 {% load crispy_forms_tags %}
 
+
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand">Manual import</a>
   </nav>
   <br/>
+<p>Requested by: {{request.user.email}}</p>
 
+
+<div class="text-center mt-3"></div>
   <!-- Success message after import -->
   {% if message %}
     {% for m in message %}
@@ -18,9 +22,10 @@
   {% endif %}
 
     {% crispy import_form %}
-
+  
 {% else %}
 <p>You are not authorised to view this page. Please login!</p>
 <a class="btn btn-outline-primary m-2"  href="{% url 'login' %}">Login</a>
 {% endif %}	
+
 {% endblock %}
