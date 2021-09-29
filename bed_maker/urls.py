@@ -8,7 +8,8 @@ urlpatterns = [
     path('', views.home, name='home'),
     
     path('manual_import/', views.manual_import, name='manual_import'),
-    path('view/', views.view, name='view'),
+    path('bedfile_requests/', views.bedfile_requests, name='bedfile_requests'),
+   # path('bedfile_requests/view/', views.view, name='view'),
     
    
     

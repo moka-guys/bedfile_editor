@@ -53,6 +53,12 @@ urlpatterns = [
     path('login/not_activated/', auth_views.PasswordResetCompleteView.as_view(template_name='registration/account_not_activated.html'),
      name='account_not_activated'),
 
+    path('view/', views.view, name='view'),
+
+    path('results/', views.results, name='results'),
+
+    path('selected_transcripts/', views.selected_transcripts, name='selected_transcripts'),
+
 ]
 
 '''

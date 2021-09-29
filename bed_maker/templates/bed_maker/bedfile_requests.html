@@ -1,0 +1,104 @@
+{% extends 'bed_maker/base.html' %}
+{% block content %}
+{% if request.user.is_authenticated %}
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand">View All Bedfile Requests</a>
+    </nav>
+    <br>
+
+    <table id="requests" class="table table-hover table-bordered">
+        <thead>
+          <tr>
+            <th>Request ID</th>
+         
+            <th>Pan number</th>
+            <th>Date Requested</th>
+            <th>Requested by</th>
+            <th>Requested for</th>
+            <th>Request Status</th>
+            <th>Results</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for var in requests %}
+          <tr>
+            <td>
+                <form action ='/view/' method ='post' id='get_request_id' >
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-lg btn-primary" name='request_id' form = 'get_request_id' value="{{ var.bedfile_request_id }}"><p1>Unique ID: {{ var.bedfile_request_id }}</p1></button>
+            </form>
+            </td>
+      
+            <td>{{ var.pan_number }}</td>
+            <td>{{ var.date_requested }}</td>
+            <td>{{ var.requested_by }}</td>
+            <td>{{ var.requested_for }}</td>
+            <td>{{ var.request_status }}</td>
+            <td>
+              
+              <form action ='/results/' method ='post' id='get_result' >
+                {% csrf_token %}
+              <button type="submit" class="btn btn-lg btn-primary" name='result_id' form = 'get_result' value="{{ var.bedfile_request_id }}"><p1>Result</p1></button>
+              </form>
+
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    
+    
+    <!-- Initialise DataTables-->
+    <script>
+        $(document).ready(function(){
+        
+         // Setup - add a text input to each footer cell
+            $('#requests tfoot th').each( function () {
+                var title = $(this).text();
+                $(this).html( '<input type="text" class="form-control" placeholder="Search '+title+'" />' );
+            } );
+         
+            // DataTable
+              // Inititialise DataTable
+          var table = $('#requests').DataTable({
+            "paging":   true,
+            "ordering": true,
+            "info":     false,
+            "pageLength": 10,
+            "searching": true,
+            "aaSorting": [],
+          });
+         
+            // Apply the search
+            table.columns().every( function () {
+                var that = this;
+         
+                $( 'input', this.footer() ).on( 'keyup change', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            } );
+        
+        
+        });
+        </script>
+ {% else %}
+<p>You are not authorised to view this page. Please login!</p>
+<a class="btn btn-outline-primary m-2"  href="{% url 'login' %}">Login</a>
+{% endif %}	
+{% endblock %}

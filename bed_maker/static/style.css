@@ -1,3 +1,6 @@
 .not-visible {
     display: none;
 }
+table th {
+    width: auto !important;
+}

@@ -18,3 +18,4 @@ class AccountAdmin(UserAdmin):
     fieldsets = ()
 
 admin.site.register(Profile, AccountAdmin)
+admin.site.register(Structure)

@@ -21,18 +21,129 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query_utils import Q
 from django.http import JsonResponse
+import re
 
 # Create your views here.
 def home(request):
     return render(request, 'bed_maker/home.html', {})
 
+def bedfile_requests(request):
+    '''
+    view all requests
+    '''
+    requests_list = BedfileRequest.objects.all().order_by('-date_requested','-bedfile_request_id')
+
+    return render(request, 'bed_maker/bedfile_requests.html', {'requests': requests_list})
+
+def results(request):
+    '''
+    View results
+    '''
+    context= {}
+    request_id = request.POST.get('result_id', None)
+    structure_list = Structure.objects.filter(bedfile_request_id=request_id)
+    structure_list = structure_list.order_by('chr_number', 'start')
+    
+    context['structures'] = structure_list
+    context['request_id'] = request_id
+
+    return render(request, 'bed_maker/results.html', context)
+
+
 def view(request):
+    #form_class = TrancsriptSelectionForm
+    #template_name = "view.html"
     """
     View a list of transcripts
     """
-    transcript_list = Transcript.objects.all()
+    context = {}
 
-    return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
+    request_id = request.POST.get('request_id', None)
+
+  
+    print(request_id)
+
+    transcript_list = Transcript.objects.filter(bedfile_request_id=request_id)
+    #gene_id = Gene.objects.filter(bedfile_request_id=request_id)
+    #return HttpResponse(request.POST)
+    context['transcripts'] = transcript_list
+    context['request_id'] = request_id
+    #return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
+    return render(request, 'bed_maker/view.html', context)
+
+def lookup_ensembl_gene(ensembl_gene_id):
+    '''
+    Get transcripts related to Ensembl Gene ID from the Ensembl REST API
+    '''
+    server = "https://rest.ensembl.org"
+
+    ext = f"/lookup/id/{ensembl_gene_id}?expand=1&utr=1"
+    
+    r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
+    
+    # Send informative error message if bad request returned 
+    if not r.ok:
+        r.raise_for_status()
+        sys.exit()
+    
+    decoded = r.json()
+    return(decoded)
+
+def selected_transcripts(request):
+    
+    context = {}
+    selected = request.POST.getlist('selected_trans[]')
+    request_number = request.POST.get('request_number')
+    #selectedlist = selected.getlist()
+    #transcripts_text = ', '.join([str(item for item in selected)])
+   
+    
+    
+    transcript_list = Transcript.objects.filter(bedfile_request_id=request_number)
+    transcript_list_final = transcript_list.filter(pk__in=selected)
+
+
+    context['selected_transcripts'] = transcript_list_final
+    context['request_id'] = request_number
+        
+
+    if request.method == 'POST':
+        if request.POST.get('confirm_selected') == 'accept':
+            context['selected_transcripts'] = transcript_list_final
+            context['request_id'] = request_number
+            context['message'] = ['LOADING']
+            render(request, 'bed_maker/selected_transcripts.html', context)
+            filtered_structure = Structure.objects.filter(bedfile_request_id=request_number)
+            filtered_structure.all().delete()
+
+
+            for item in selected: 
+                transcript = transcript_list_final.filter(transcript_id=item)
+                transcript_ID = transcript.get().transcript_id
+                gene_ID = transcript.get().gene_id
+                bedfile_request_ID=transcript.get().bedfile_request_id
+                Ensemble_transcript_ID = transcript.get().ensembl_transcript_id
+               
+                data = lookup_ensembl_gene(Ensemble_transcript_ID)
+                for exon in data['Exon']:
+                        Structure_Data = Structure(
+                                bedfile_request_id = BedfileRequest(bedfile_request_id=bedfile_request_ID).bedfile_request_id,
+                                gene_id = Gene(gene_id=gene_ID).gene_id,
+                                transcript_id = Transcript(transcript_id=transcript_ID),
+                                ensembl_structure_id = exon['id'],
+                                structure_type = exon['object_type'],
+                                version_number =   exon['version'],
+                                start =  exon['start'],
+                                end = exon['end'],
+                                DNA_strand =  exon['strand'],
+                                chr_number = exon['seq_region_name']
+                        )
+                        Structure_Data.save()
+            context['message'] = ['Exons Imported Successfully']
+
+    return render(request, 'bed_maker/selected_transcripts.html', context)
+    #return HttpResponse('Success')
+    #return HttpResponse(request.POST)
 
 def get_MANE_list():
     '''
@@ -64,23 +175,7 @@ def get_MANE_list():
     
     return(MANE_list_df)  
 
-def lookup_ensembl_gene(ensembl_gene_id):
-    '''
-    Get transcripts related to Ensembl Gene ID from the Ensembl REST API
-    '''
-    server = "https://rest.ensembl.org"
 
-    ext = f"/lookup/id/{ensembl_gene_id}?expand=1&utr=1"
-    
-    r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
-    
-    # Send informative error message if bad request returned 
-    if not r.ok:
-        r.raise_for_status()
-        sys.exit()
-    
-    decoded = r.json()
-    return(decoded)
 
 def manual_import(request):
     """
@@ -107,6 +202,7 @@ def manual_import(request):
                 pan_number = cleaned_data['pan_number'],
                 date_requested = cleaned_data['date_requested'],
                 requested_by = request.user.email,
+                requested_for = cleaned_data['requested_for'],
                 request_status = 'draft',
             )
 

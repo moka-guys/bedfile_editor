@@ -5,13 +5,15 @@
     <a class="navbar-brand">Transcripts for Requested ID: {{ request_id }}</a>
     </nav>
     <br>
-
+    
+    <form  method ='post' id='confirm_selected_transcript' >
+     
     <table id="transcripts2" class="table table-hover table-bordered">
-      <form action ='/selected_transcripts/' method ='post' id='get_transcript_id' >
+ 
         {% csrf_token %}
         <thead>
           <tr>
-            <th>Select</th>
+      
             <th>Ensemble Gene ID</th>
             <th>Gene</th>
             <th>Transcript</th>
@@ -22,42 +24,38 @@
           </tr>
         </thead>
         <tbody>
-          {% for var in transcripts %}
+          {% for var in selected_transcripts %}
           
           <tr>
-            <td><div class="form-check" style='text-align: center;'>
-              <input class="form-check-input " type="checkbox" name='selected_trans[]' form = "get_transcript_id" value=
-              '{{ var.transcript_id }}'>
-            </div></td>
-            <td>{{ var.gene_id.ensembl_gene_id }}</td>
+            <td><input class="form-check-input " type="hidden" name='selected_trans[]' form = "confirm_selected_transcript" value=
+              '{{ var.transcript_id }}'>{{ var.gene_id.ensembl_gene_id }}</td>
             <td>{{ var.display_name }}</td>
             <td>{{ var.ensembl_transcript_id }}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
             <td>{{ var.MANE_transcript }}</td>
             <td>{{ var.RefSeq_transcript_id }}</td>
-
+            
           </tr>
           {% endfor %}
         </tbody>
-        <tfoot>
-          <tr>
-            <th>
-              <input type="hidden" name='request_number' form = "get_transcript_id" value = '{{ request_id }}'>
-              <button type="submit" class="btn btn-lg btn-primary" form ='get_transcript_id'  name="transcript_id" ><p1>Import</p1></button>
-            </th>  
-            <th><add></add></th>
-            <th><add></add></th>
-            <th><add></add></th>
-            <th><add></add></th>
-            <th><add></add></th>
-            <th><add></add></th>
-            <th><add></add></th>
-          </tr>
-        </tfoot>
+    </table>   
+        <input type="hidden" name='request_number' form = "confirm_selected_transcript" value = '{{ request_id }}'>
+        <button type="submit" class="btn btn-lg btn-primary" form ='confirm_selected_transcript'  name="confirm_selected" value='accept'><p1>Accept</p1></button>
+
       </form>
-      </table>
-    
+     
+      <p value='p2'></p>
+     
+     
+      {% if message %}
+            {% for m in message %}
+            <div class="alert alert-success">
+              {{ m }}
+           </div>
+           {% endfor %}
+        {% endif %}
+
     
     <!-- Initialise DataTables-->
     <script>

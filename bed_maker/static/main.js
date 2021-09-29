@@ -5,7 +5,7 @@ $(document).ready(function() {
                 e.preventDefault();
                 $.ajax({
                     type : "POST",
-                    url : "http://127.0.0.1:8000/manual_import/",
+                    url : "/manual_import/",
                     data : $("#manual-upload-form").serialize(),
                     beforeSend : function() {
                           $("#p1").append('<div id="spinner-circle" class="text-center mt-3"><div class="spinner-border text-primary" role="status"><h3>-------LOADING!</h3></div></div>');
@@ -22,7 +22,11 @@ $(document).ready(function() {
                 e.preventDefault();
             });
 
+
         });
+
+
+
 //$.ajax ({
  //   type: 'GET',
  //   url: 'manual_import/',
