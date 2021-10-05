@@ -15,8 +15,10 @@
             <th>Ensemble Gene ID</th>
             <th>Gene</th>
             <th>Transcript</th>
+            <th>Chr</th>
             <th>Start</th>
             <th>End</th>
+            <th>Exons No</th>
             <th>MANE Transcript?</th>
             <th>RefSeq stable ID</th>
           </tr>
@@ -32,8 +34,10 @@
             <td>{{ var.gene_id.ensembl_gene_id }}</td>
             <td>{{ var.display_name }}</td>
             <td>{{ var.ensembl_transcript_id }}</td>
+            <td>{{ var.gene_id.chr_num }}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
+            <td>{{ var.num_exons }}</td>
             <td>{{ var.MANE_transcript }}</td>
             <td>{{ var.RefSeq_transcript_id }}</td>
 
@@ -46,6 +50,8 @@
               <input type="hidden" name='request_number' form = "get_transcript_id" value = '{{ request_id }}'>
               <button type="submit" class="btn btn-lg btn-primary" form ='get_transcript_id'  name="transcript_id" ><p1>Import</p1></button>
             </th>  
+            <th><add></add></th>
+            <th><add></add></th>
             <th><add></add></th>
             <th><add></add></th>
             <th><add></add></th>

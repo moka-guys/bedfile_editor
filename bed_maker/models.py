@@ -30,6 +30,7 @@ class Gene(models.Model):
     # ensembl gene ID begining ENSG
     ensembl_gene_id = models.CharField(max_length=15)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
+    chr_num = models.CharField(max_length=50)
 
 class Transcript(models.Model):
     """
@@ -46,22 +47,25 @@ class Transcript(models.Model):
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
+    num_exons = models.CharField(max_length=50)
 
 class Structure(models.Model):
     """
     Model to store location of exons for each transcript
     """
-    structure_id=models.AutoField(primary_key=True)
-    bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
-    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE)
-    transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE)
-    ensembl_structure_id = models.CharField(max_length=15)
-    structure_type = models.CharField(max_length=50)
-    version_number = models.CharField(max_length=50)
-    start = models.CharField(max_length=50)
-    end = models.CharField(max_length=50)
-    chr_number = models.CharField(max_length=50)
-    DNA_strand = models.CharField(max_length=50)
+    structure_id            = models.AutoField(primary_key=True)
+    bedfile_request_id      = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
+    gene_id                 = models.ForeignKey('Gene', on_delete=models.CASCADE)
+    transcript_id           = models.ForeignKey('Transcript', on_delete=models.CASCADE)
+    ensembl_structure_id    = models.CharField(max_length=15)
+    structure_type          = models.CharField(max_length=50)
+    version_number          = models.CharField(max_length=50)
+    start                   = models.CharField(max_length=50)
+    start_padded            = models.CharField(max_length=50)
+    end                     = models.CharField(max_length=50)
+    end_padded              = models.CharField(max_length=50)
+    DNA_strand              = models.CharField(max_length=50)
+    exon_number             = models.CharField(max_length=50)
 
 
 class MyAccountManager(BaseUserManager):

@@ -42,12 +42,54 @@ def results(request):
     context= {}
     request_id = request.POST.get('result_id', None)
     structure_list = Structure.objects.filter(bedfile_request_id=request_id)
-    structure_list = structure_list.order_by('chr_number', 'start')
-    
-    context['structures'] = structure_list
-    context['request_id'] = request_id
+    structure_list = structure_list.order_by('-gene_id__chr_num', 'start')
 
+    date_value = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    #if request.method == 'POST':
+    if request.POST.get('get_file') == 'download':
+        #list_of_exons = request.POST.get('exons[]')
+        request_id = request.POST.get('request_id', None)
+        structure_list = Structure.objects.filter(bedfile_request_id=request_id)
+        structure_list = structure_list.order_by('gene_id__chr_num', 'start')
+        bedfile_request = BedfileRequest.objects.filter(bedfile_request_id=request_id)
+        
+    
+     
+        requested_by =  str(bedfile_request.get().requested_by)
+        requested_for =  str(bedfile_request.get().requested_for)
+        pan_number = str(bedfile_request.get().pan_number)
+
+        lines=['#'+ date_value + ' by ' + requested_by + ' for ' + requested_for]
+        lines.append('#Chr\tStart\tStop\tEnsembl_ID\tGene_Accession')
+      
+        structure_ID = structure_list.values_list('structure_id')
+        print(structure_ID)
+        for ID in structure_ID:
+            print(ID)
+            ID_NUM = re.findall(r'\d+', str(ID))
+            for item in ID_NUM:
+                print(item)
+                line = structure_list.filter(structure_id=item)
+                chrom = str(line.get().gene_id.chr_num)
+                start = str(line.get().start_padded)
+                end = str(line.get().end_padded)
+                ensembl_id = str(line.get().transcript_id.ensembl_transcript_id)
+                gene_accession = str(line.get().transcript_id.display_name) + ';' + str(line.get().transcript_id.RefSeq_transcript_id)
+
+                lines.append(chrom+'\t'+start+'\t'+end+'\t'+ensembl_id+'\t'+gene_accession)
+                #lines.append(ID)
+        bed_file = '\n'.join(lines)
+        response = HttpResponse(content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename=' + pan_number + '.bed'
+        response.writelines(bed_file)
+        return response
+    context['request_id'] = request_id
+    context['structures'] = structure_list
+    
+    
     return render(request, 'bed_maker/results.html', context)
+
 
 
 def view(request):
@@ -125,7 +167,12 @@ def selected_transcripts(request):
                 Ensemble_transcript_ID = transcript.get().ensembl_transcript_id
                
                 data = lookup_ensembl_gene(Ensemble_transcript_ID)
-                for exon in data['Exon']:
+                number_exons = len(data['Exon'])
+                if number_exons > 0:
+                    count=0
+                    for exon in data['Exon']:
+                        count +=1
+                        print(count)
                         Structure_Data = Structure(
                                 bedfile_request_id = BedfileRequest(bedfile_request_id=bedfile_request_ID).bedfile_request_id,
                                 gene_id = Gene(gene_id=gene_ID).gene_id,
@@ -134,9 +181,11 @@ def selected_transcripts(request):
                                 structure_type = exon['object_type'],
                                 version_number =   exon['version'],
                                 start =  exon['start'],
+                                start_padded = exon['start']-10,
                                 end = exon['end'],
+                                end_padded = exon['end']+10,
                                 DNA_strand =  exon['strand'],
-                                chr_number = exon['seq_region_name']
+                                exon_number = count
                         )
                         Structure_Data.save()
             context['message'] = ['Exons Imported Successfully']
@@ -215,12 +264,15 @@ def manual_import(request):
             # List comprehension to split lines input by user into a list and trim any white space
             gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
             for gene_ID in gene_list:
+                # Populate database with transcript details for each gene using Ensembl API
+                gene_object = lookup_ensembl_gene(gene_ID)
+                chromosome = gene_object['seq_region_name']
                 gene = Gene.objects.create(
                 ensembl_gene_id = gene_ID,
                 bedfile_request_id = bedfile_request,
+                chr_num=chromosome
                 )
-                # Populate database with transcript details for each gene using Ensembl API
-                gene_object = lookup_ensembl_gene(gene_ID)
+              
                 for transcript_dict in gene_object["Transcript"]:
                     # check if the Transcript ID is present in a list of all MANE transcripts, if it does it allocates True to the field MANE_transcript 
                     # and adds the appropriate RefSeq ID to the field
@@ -230,6 +282,10 @@ def manual_import(request):
                     else:
                         MANE_transcript = 'False'
                         RefSeq_transcript_id = ''
+                    if transcript_dict["Exon"]:
+                        number_of_exons = len(transcript_dict["Exon"])
+                    else:
+                        number_of_exons = 0
                     transcript = Transcript.objects.create(
                     ensembl_transcript_id = transcript_dict["id"],
                     bedfile_request_id = bedfile_request,
@@ -238,7 +294,8 @@ def manual_import(request):
                     start = transcript_dict["start"],
                     end = transcript_dict["end"],
                     MANE_transcript = MANE_transcript,
-                    RefSeq_transcript_id = RefSeq_transcript_id
+                    RefSeq_transcript_id = RefSeq_transcript_id,
+                    num_exons = number_of_exons
                     )
             # add success message to page
             context['message'] = ['Gene list was uploaded successfully']

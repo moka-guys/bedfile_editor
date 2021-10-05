@@ -16,9 +16,11 @@
       
             <th>Ensemble Gene ID</th>
             <th>Gene</th>
+            <th>Chr</th>
             <th>Transcript</th>
             <th>Start</th>
             <th>End</th>
+            <th>Number of Exons</th>
             <th>MANE Transcript?</th>
             <th>RefSeq stable ID</th>
           </tr>
@@ -30,9 +32,11 @@
             <td><input class="form-check-input " type="hidden" name='selected_trans[]' form = "confirm_selected_transcript" value=
               '{{ var.transcript_id }}'>{{ var.gene_id.ensembl_gene_id }}</td>
             <td>{{ var.display_name }}</td>
+            <td>{{ var.gene_id.chr_num }}</td>
             <td>{{ var.ensembl_transcript_id }}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
+            <td>{{ var.num_exons }}</td>
             <td>{{ var.MANE_transcript }}</td>
             <td>{{ var.RefSeq_transcript_id }}</td>
             
@@ -40,7 +44,7 @@
           {% endfor %}
         </tbody>
     </table>   
-        <input type="hidden" name='request_number' form = "confirm_selected_transcript" value = '{{ request_id }}'>
+        <input type="hidden" name='result_id' form = "confirm_selected_transcript" value = '{{ request_id }}'>
         <button type="submit" class="btn btn-lg btn-primary" form ='confirm_selected_transcript'  name="confirm_selected" value='accept'><p1>Accept</p1></button>
 
       </form>

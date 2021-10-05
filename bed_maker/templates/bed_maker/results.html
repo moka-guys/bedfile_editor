@@ -2,12 +2,12 @@
 {% block content %}
 {% if request.user.is_authenticated %}
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-    <a class="navbar-brand">Transcripts for Requested ID: {{ request_id }}</a>
+    <a class="navbar-brand">Results for Requested ID: {{ request_id }}</a>
     </nav>
     <br>
-
+    <form action ='/results/' method ='POST' id='download_data' >
     <table id="results" class="table table-hover table-bordered">
-      <form action ='/selected_transcripts/' method ='post' id='get_transcript_id' >
+   
         {% csrf_token %}
         <thead>
           <tr>
@@ -17,7 +17,9 @@
             <th>Version Number</th>
             <th>Chr</th>
             <th>Start</th>
+            <th>Start (-10bp)</th>
             <th>End</th>
+            <th>End (+10bp</th>
             <th>DNA Strand</th>
           </tr>
         </thead>
@@ -25,13 +27,16 @@
           {% for var in structures %}
           
           <tr>
-            <td>{{ var.transcript_id.display_name }}</td>
+            <td><input class="form-check-input " type="hidden" name='exons[]' form = "download_data" value=
+                '{{ var.structure_id }}'>{{ var.transcript_id.display_name }}</td>
             <td>{{ var.ensembl_structure_id }}</td>
-            <td>{{ var.structure_type }}</td>
-            <td>{{ var.version_number }}</td>
-            <td>{{ var.chr_number }}</td>
+            <td>{{ var.structure_type }} {{ var.exon_number }} of {{ var.transcript_id.num_exons }}</td>
+            <td>{{ var.version_number }} </td>
+            <td>{{ var.gene_id.chr_num }}</td>
             <td>{{ var.start }}</td>
+            <td>{{ var.start_padded }}</td>
             <td>{{ var.end }}</td>
+            <td>{{ var.end_padded }}</td>
             <td>{{ var.DNA_strand }}</td>
           </tr>
           {% endfor %}
@@ -46,11 +51,17 @@
             <th><add></add></th>
             <th><add></add></th>
             <th><add></add></th>
+            <th><add></add></th>
+            <th><add></add></th>
           </tr>
         </tfoot>
-      </form>
+     
       </table>
-    
+
+      <input class="form-check-input " type="hidden" name='request_id' form = "download_data" value=
+      '{{ request_id }}'>
+      <button type="submit" class="btn btn-primary btn-lg btn-block" name='get_file' value='download' form='download_data'>Download</button>
+      </form>
     
     <!-- Initialise DataTables-->
     <script>
