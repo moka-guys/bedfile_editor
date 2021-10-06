@@ -40,3 +40,14 @@ class Transcript(models.Model):
     full_ensembl_transcript_id = models.CharField(max_length=20)
     full_RefSeq_transcript_id = models.CharField(max_length=20)
     
+class SelectedTranscript(models.Model):
+    """
+    Model to store transcript details
+    """ 
+    selected_transcript_id = models.AutoField(primary_key=True)   
+    transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE)
+    transcript_padding = models.IntegerField()
+    include_introns = models.IntegerField()
+    exon_padding = models.IntegerField()
+    include_UTRs= models.BooleanField()
+    UTR_padding = models.IntegerField()
