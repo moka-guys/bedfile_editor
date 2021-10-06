@@ -43,6 +43,9 @@ class Transcript(models.Model):
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
+    RefSeq_HGMD_transcript = models.BooleanField()
+    clinvar_variant_coverage = models.FloatField()
+    coding_transcript = models.BooleanField()
     full_ensembl_transcript_id = models.CharField(max_length=20)
     full_RefSeq_transcript_id = models.CharField(max_length=20)
     
