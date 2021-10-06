@@ -91,6 +91,16 @@ def manual_import(request):
                 date_requested = cleaned_data['date_requested'],
                 requested_by = cleaned_data['requested_by'],
                 request_status = 'draft',
+                request_transcript_padding = models.IntegerField()''
+                request_introns = False'
+                request_exon_padding = 0'
+                request_five_prime_UTR = False,
+                request_three_prime_UTR = False,
+                request_five_prime_UTR_padding = 0,
+                request_three_prime_UTR_padding = 0,
+                panel_category = ''
+                panel_subcategory = ''
+                panel_name = ''
             )
 
             # Use the TARK API to get most recent version of the MANE transcript list
@@ -132,6 +142,9 @@ def manual_import(request):
                     RefSeq_transcript_version = RefSeq_transcript_version,
                     full_ensembl_transcript_id = f'{transcript_dict["id"]}.{transcript_dict["version"]}',
                     full_RefSeq_transcript_id = f'{RefSeq_transcript_version}.{RefSeq_transcript_version}',
+                    RefSeq_HGMD_transcript = False
+                    clinvar_variant_coverage = 100
+                    coding_transcript = True
                     )
             # add success message to page
             context['message'] = ['Gene list was uploaded successfully']
