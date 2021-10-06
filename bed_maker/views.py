@@ -91,7 +91,7 @@ def manual_import(request):
                 date_requested = cleaned_data['date_requested'],
                 requested_by = cleaned_data['requested_by'],
                 request_status = 'draft',
-                request_transcript_padding = models.IntegerField(),
+                request_transcript_padding = 0,
                 request_introns = False,
                 request_exon_padding = 0,
                 request_five_prime_UTR = False,
