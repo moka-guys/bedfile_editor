@@ -38,8 +38,10 @@ class Transcript(models.Model):
     transcript_id = models.AutoField(primary_key=True)
     # ensembl transcript ID begining ENST
     ensembl_transcript_id = models.CharField(max_length=15)
+    ensembl_transcript_version = models.CharField(max_length=3)
     # RefSeq transcript ID begining NM
     RefSeq_transcript_id = models.CharField(max_length=15)
+    RefSeq_transcript_version = models.CharField(max_length=3)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
     gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE)
     display_name = models.CharField(max_length=15)
