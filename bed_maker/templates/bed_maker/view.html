@@ -20,11 +20,11 @@
           {% for var in transcripts %}
           <tr>
             <td>{{ var.display_name }}</td>
-            <td>{{ var.ensembl_transcript_id }}</td>
+            <td>{{ var.full_ensembl_transcript_id }}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
             <td>{{ var.MANE_transcript }}</td>
-            <td>{{ var.RefSeq_transcript_id }}</td>
+            <td>{{ var.full_RefSeq_transcript_id }}</td>
 
           </tr>
           {% endfor %}

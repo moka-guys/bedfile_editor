@@ -114,18 +114,24 @@ def manual_import(request):
                     if transcript_dict["id"] in MANE_list_df.ens_stable_id.values:
                         MANE_transcript = 'True'
                         RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript_dict["id"]]['refseq_stable_id'].item()
+                        RefSeq_transcript_version = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript_dict["id"]]['refseq_stable_id_version'].item()
                     else:
                         MANE_transcript = 'False'
                         RefSeq_transcript_id = ''
+                        RefSeq_transcript_version = ''
                     transcript = Transcript.objects.create(
                     ensembl_transcript_id = transcript_dict["id"],
+                    ensembl_transcript_version = transcript_dict["version"],
                     bedfile_request_id = bedfile_request,
                     gene_id = gene,
                     display_name = transcript_dict["display_name"],
                     start = transcript_dict["start"],
                     end = transcript_dict["end"],
                     MANE_transcript = MANE_transcript,
-                    RefSeq_transcript_id = RefSeq_transcript_id
+                    RefSeq_transcript_id = RefSeq_transcript_id,
+                    RefSeq_transcript_version = RefSeq_transcript_version,
+                    full_ensembl_transcript_id = f'{transcript_dict["id"]}.{transcript_dict["version"]}',
+                    full_RefSeq_transcript_id = f'{RefSeq_transcript_version}.{RefSeq_transcript_version}',
                     )
             # add success message to page
             context['message'] = ['Gene list was uploaded successfully']
