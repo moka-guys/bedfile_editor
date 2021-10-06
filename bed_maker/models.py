@@ -49,6 +49,6 @@ class SelectedTranscript(models.Model):
     transcript_padding = models.IntegerField()
     include_introns = models.IntegerField()
     exon_padding = models.IntegerField()
-    include_fivePrimeUTR= models.BooleanField()
-    include_threePrimeUTR= models.BooleanField()
+    include_five_prime_UTR= models.BooleanField()
+    include_three_prime_UTR= models.BooleanField()
     UTR_padding = models.IntegerField()
