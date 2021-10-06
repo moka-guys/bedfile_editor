@@ -11,7 +11,13 @@ class BedfileRequest(models.Model):
     date_requested = models.DateField()
     requested_by = models.CharField(max_length=20)
     request_status = models.CharField(max_length=10, choices=(('draft', 'draft'), ('published', 'published')))
-
+    request_transcript_padding = models.IntegerField()
+    request_introns = models.BooleanField()
+    request_exon_padding = models.IntegerField()
+    request_five_prime_UTR= models.BooleanField()
+    request_three_prime_UTR= models.BooleanField()
+    request_five_prime_UTR_padding = models.IntegerField()
+    request_three_prime_UTR_padding = models.IntegerField()
 
 class Gene(models.Model):
     """
@@ -47,8 +53,9 @@ class SelectedTranscript(models.Model):
     selected_transcript_id = models.AutoField(primary_key=True)   
     transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE)
     transcript_padding = models.IntegerField()
-    include_introns = models.IntegerField()
+    include_introns = models.BooleanField()
     exon_padding = models.IntegerField()
-    include_five_prime_UTR= models.BooleanField()
-    include_three_prime_UTR= models.BooleanField()
-    UTR_padding = models.IntegerField()
+    include_five_prime_UTR = models.BooleanField()
+    include_three_prime_UTR = models.BooleanField()
+    five_prime_UTR_padding = models.IntegerField()
+    three_prime_UTR_padding = models.IntegerField()
