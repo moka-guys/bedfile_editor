@@ -14,6 +14,9 @@
             <th>End</th>
             <th>MANE Transcript?</th>
             <th>RefSeq stable ID</th>
+            <td>RefSeq_HGMD_transcript?</td>
+            <td>Percentage ClinVar Variants Covered</td>
+            <td>Coding transcript?</td>
           </tr>
         </thead>
         <tbody>
@@ -25,12 +28,18 @@
             <td>{{ var.end }}</td>
             <td>{{ var.MANE_transcript }}</td>
             <td>{{ var.full_RefSeq_transcript_id }}</td>
+            <td>{{ var.RefSeq_HGMD_transcript }}</td>
+            <td>{{ var.clinvar_variant_coverage }}</td>
+            <td>{{ var.coding_transcript }}</td>
 
           </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
+            <th></th>
+            <th></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>
