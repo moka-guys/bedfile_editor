@@ -51,7 +51,7 @@ def results(request):
         #list_of_exons = request.POST.get('exons[]')
         request_id = request.POST.get('request_id', None)
         structure_list = Structure.objects.filter(bedfile_request_id=request_id)
-        structure_list = structure_list.order_by('gene_id__chr_num', 'start')
+        structure_list = structure_list.order_by('-gene_id__chr_num', 'start')
         bedfile_request = BedfileRequest.objects.filter(bedfile_request_id=request_id)
         
     
@@ -145,21 +145,19 @@ def selected_transcripts(request):
     transcript_list_final = transcript_list.filter(pk__in=selected)
 
 
-    context['selected_transcripts'] = transcript_list_final
-    context['request_id'] = request_number
-        
-
-    if request.method == 'POST':
-        if request.POST.get('confirm_selected') == 'accept':
-            context['selected_transcripts'] = transcript_list_final
-            context['request_id'] = request_number
-            context['message'] = ['LOADING']
+  
+    if request.POST.get('confirm_selected') == 'accept':
+            selected = request.POST.getlist('selected_trans[]')
+            request_number = request.POST.get('request_id', None)
+            transcript_list = Transcript.objects.filter(bedfile_request_id=request_number)
+            transcript_list_final = transcript_list.filter(pk__in=selected)
             render(request, 'bed_maker/selected_transcripts.html', context)
             filtered_structure = Structure.objects.filter(bedfile_request_id=request_number)
             filtered_structure.all().delete()
 
 
             for item in selected: 
+                print(item)
                 transcript = transcript_list_final.filter(transcript_id=item)
                 transcript_ID = transcript.get().transcript_id
                 gene_ID = transcript.get().gene_id
@@ -190,6 +188,9 @@ def selected_transcripts(request):
                         Structure_Data.save()
             context['message'] = ['Exons Imported Successfully']
 
+
+    context['selected_transcripts'] = transcript_list_final
+    context['request_id'] = request_number
     return render(request, 'bed_maker/selected_transcripts.html', context)
     #return HttpResponse('Success')
     #return HttpResponse(request.POST)

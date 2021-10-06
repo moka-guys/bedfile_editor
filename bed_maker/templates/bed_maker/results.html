@@ -60,8 +60,12 @@
 
       <input class="form-check-input " type="hidden" name='request_id' form = "download_data" value=
       '{{ request_id }}'>
-      <button type="submit" class="btn btn-primary btn-lg btn-block" name='get_file' value='download' form='download_data'>Download</button>
-      </form>
+      {% if structures %}
+      <div class="bold">
+        <button type="submit" class="btn btn-primary btn-lg btn-block" name='get_file' value='download' form='download_data'>Download</button>
+     </div>
+    {% endif %}
+        </form>
     
     <!-- Initialise DataTables-->
     <script>

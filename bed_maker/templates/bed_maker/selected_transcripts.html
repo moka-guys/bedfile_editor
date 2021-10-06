@@ -6,7 +6,7 @@
     </nav>
     <br>
     
-    <form  method ='post' id='confirm_selected_transcript' >
+    <form action =''  method ='post' id='confirm_selected_transcript' >
      
     <table id="transcripts2" class="table table-hover table-bordered">
  
@@ -44,7 +44,7 @@
           {% endfor %}
         </tbody>
     </table>   
-        <input type="hidden" name='result_id' form = "confirm_selected_transcript" value = '{{ request_id }}'>
+        <input type="hidden" name='request_id' form = "confirm_selected_transcript" value = '{{ request_id }}'>
         <button type="submit" class="btn btn-lg btn-primary" form ='confirm_selected_transcript'  name="confirm_selected" value='accept'><p1>Accept</p1></button>
 
       </form>
