@@ -18,6 +18,9 @@ class BedfileRequest(models.Model):
     request_three_prime_UTR= models.BooleanField()
     request_five_prime_UTR_padding = models.IntegerField()
     request_three_prime_UTR_padding = models.IntegerField()
+    panel_category = models.CharField(max_length=25)
+    panel_subcategory = models.CharField(max_length=25)
+    panel_name = models.CharField(max_length=25)
 
 class Gene(models.Model):
     """
