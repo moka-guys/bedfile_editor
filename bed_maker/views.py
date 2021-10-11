@@ -140,11 +140,9 @@ def manual_import(request):
                     MANE_transcript = MANE_transcript,
                     RefSeq_transcript_id = RefSeq_transcript_id,
                     RefSeq_transcript_version = RefSeq_transcript_version,
-                    full_RefSeq_transcript_id = f'{RefSeq_transcript_id}.{RefSeq_transcript_version}',
-                    full_ensembl_transcript_id = f'{transcript_dict["id"]}.{transcript_dict["version"]}',
                     RefSeq_HGMD_transcript = False,
                     clinvar_variant_coverage = 100,
-                    coding_transcript = gene_object["biotype"],
+                    biotype = gene_object["biotype"],
                     )
             # add success message to page
             context['message'] = ['Gene list was uploaded successfully']

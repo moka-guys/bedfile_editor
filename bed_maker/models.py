@@ -50,9 +50,7 @@ class Transcript(models.Model):
     MANE_transcript = models.BooleanField()
     RefSeq_HGMD_transcript = models.BooleanField()
     clinvar_variant_coverage = models.FloatField()
-    coding_transcript = models.CharField(max_length=21)
-    full_ensembl_transcript_id = models.CharField(max_length=20)
-    full_RefSeq_transcript_id = models.CharField(max_length=20)
+    biotype = models.CharField(max_length=21)
     
 class SelectedTranscript(models.Model):
     """
