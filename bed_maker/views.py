@@ -91,16 +91,16 @@ def manual_import(request):
                 date_requested = cleaned_data['date_requested'],
                 requested_by = cleaned_data['requested_by'],
                 request_status = 'draft',
-                request_transcript_padding = 0,
-                request_introns = False,
-                request_exon_padding = 0,
-                request_five_prime_UTR = False,
-                request_three_prime_UTR = False,
-                request_five_prime_UTR_padding = 0,
-                request_three_prime_UTR_padding = 0,
-                panel_category = '',
-                panel_subcategory = '',
-                panel_name = '',
+                request_transcript_padding = cleaned_data['request_transcript_padding'],
+                request_introns = cleaned_data['request_introns'],
+                request_exon_padding = cleaned_data['request_exon_padding'],
+                request_five_prime_UTR = cleaned_data['request_five_prime_UTR'],
+                request_three_prime_UTR = cleaned_data['request_three_prime_UTR'],
+                request_five_prime_UTR_padding = cleaned_data['request_five_prime_UTR_padding'],
+                request_three_prime_UTR_padding = cleaned_data['request_three_prime_UTR_padding'],
+                panel_category = cleaned_data['panel_category'],
+                panel_subcategory = cleaned_data['panel_subcategory'],
+                panel_name = cleaned_data['panel_name'],
             )
 
             # Use the TARK API to get most recent version of the MANE transcript list
@@ -144,7 +144,7 @@ def manual_import(request):
                     full_ensembl_transcript_id = f'{transcript_dict["id"]}.{transcript_dict["version"]}',
                     RefSeq_HGMD_transcript = False,
                     clinvar_variant_coverage = 100,
-                    coding_transcript = True,
+                    coding_transcript = gene_object["biotype"],
                     )
             # add success message to page
             context['message'] = ['Gene list was uploaded successfully']

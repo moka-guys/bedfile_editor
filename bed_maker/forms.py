@@ -26,10 +26,22 @@ class ManualUploadForm(forms.Form):
     panel_category = forms.CharField()
     panel_subcategory = forms.CharField()
     panel_name = forms.CharField()
+    
+    genome_ref_select = forms.ChoiceField(
+    choices = (
+        ('GRCh38', "GRCh38"), 
+        ('GRCh37', "GRCh37"),
+    ),
+    widget = forms.RadioSelect,
+    initial = 'GRCh38',
+    )
+
+    region_list = forms.CharField(widget=forms.Textarea)
+    
     bedfile_select = forms.ChoiceField(
     choices = (
-        ('Standard Bedfile', "Standard Bedfile Add description"), 
-        ('RPKM Bedfile', "RPKM BedFile Add description"),
+        ('Standard Bedfile', "Create Standard Bedfile for variant calling"), 
+        ('RPKM Bedfile', "Create RPKM BedFile for calculating coverage"),
     ),
     widget = forms.RadioSelect,
     initial = 'Standard Bedfile',
@@ -77,9 +89,11 @@ class ManualUploadForm(forms.Form):
             Column(Field('request_three_prime_UTR', placeholder="Include 3' UTR")),
             Column(Field('request_three_prime_UTR_padding', value=0)),
             ),
+            HTML('<br><h5>Manually Enter Additional Genomic Regions</h5><br>'),
+            Field('genome_ref_select'),
+            Field('region_list', placeholder="Enter additional genomic regions (ID,Chr,Start,End)\nRegion1,3,100000,200000 \nRegion2,11,180000,200000"),
             HTML('<br><h5>Bedfile Format </h5><br>'),
-            Field('bedfile_select')
-
+            Field('bedfile_select'),
         )
 
 
