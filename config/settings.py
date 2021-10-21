@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'bed_maker',
     'crispy_forms',
     'whitenoise.runserver_nostatic',
+    'Profiles',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = str(os.path.join(BASE_DIR, 'sent_emails'))
+
+AUTH_USER_MODEL = 'Profiles.Profile'
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.AllowAllUsersModelBackend']
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = '1025'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
