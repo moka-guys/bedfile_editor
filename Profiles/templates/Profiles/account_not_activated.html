@@ -1,0 +1,12 @@
+{% extends 'bed_maker/base.html' %}
+
+{% block content %}
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand">Account not activated</a>
+    </nav>
+    <br>
+    <strong><p>You tried to login with an email address that was not activated.</p>
+    <p>Please check your emails to find the registration link.</p> 
+    <p>Alternatively, you can sign-up again with a different email address:</p>
+    <a class="btn btn-outline-primary m-2" href="{% url 'signup' %}">SIGN-UP</a></strong>
+{% endblock %}
