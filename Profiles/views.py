@@ -39,11 +39,6 @@ def signup(request):
                 'token': default_token_generator.make_token(user),
             })
             email = signup_form.cleaned_data.get('email').lower()
-            print(subject)
-            print(message)
-            print(email)
-            print(settings.SENDER_EMAIL)
-
             send_mail(subject, message, settings.SENDER_EMAIL, [email], fail_silently=False)
             return redirect('account_activation_sent')
         else:
