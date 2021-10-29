@@ -42,7 +42,7 @@ def signup(request):
             send_mail(subject, message, settings.SENDER_EMAIL, [email], fail_silently=False)
             return redirect('account_activation_sent')
         else:
-            print(signup_form.errors)
+            print(signup_form.errors) #TODO Add code in HTML to prompt user with any SIGNUP issues.
     else:
 
         signup_form = SignUpForm()
