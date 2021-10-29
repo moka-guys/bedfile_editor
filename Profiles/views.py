@@ -20,7 +20,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query_utils import Q
 from django.http import JsonResponse
 import re
-
+from django.conf import settings
 
 # Create your views here.
 def signup(request):
@@ -39,9 +39,12 @@ def signup(request):
                 'token': default_token_generator.make_token(user),
             })
             email = signup_form.cleaned_data.get('email').lower()
-            send_mail(subject, message, 'bed_maker@admin.com', [email])
+            send_mail(subject, message, settings.SENDER_EMAIL, [email], fail_silently=False)
             return redirect('account_activation_sent')
+        else:
+            print(signup_form.errors) #TODO Add code in HTML to prompt user with any SIGNUP issues.
     else:
+
         signup_form = SignUpForm()
     return render(request, 'Profiles/signup.html', {'form': signup_form})
 
@@ -136,7 +139,7 @@ def password_reset_request(request):
                     }
                     email = render_to_string(email_template_name, c)
                     try:
-                        send_mail(subject, email, 'admin@example.com' , [user.email], fail_silently=False)
+                        send_mail(subject, email, settings.SENDER_EMAIL , [user.email], fail_silently=False)
                     except:
                         return HttpResponse('Invalid header found.')
                     return redirect ("password_reset_done")
