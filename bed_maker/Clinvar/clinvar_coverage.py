@@ -74,29 +74,6 @@ def get_variants(intervals):
             result.add(v.ID)  
     return list(result)
 
-'''
-def annotate_transcript(gene_variants, transcript):
-    coverage_data = []
-    transcript_intervals = get_transcript_intervals(transcript)
-        # exclude haplotypes (as not in clinvar)
-    transcript_intervals = list([ i for i in transcript_intervals if 'hap' not in i[0] ])
-        # build result dict
-    coverage_data.append({
-        'id': transcript['id'],
-        'variants': get_variants(transcript_intervals) if transcript_intervals else [],
-        'coding': bool(transcript_intervals)
-    })
-        # count gene variants and update covered clinvar fraction
-        # gene_variants = set([ variant for t in transcripts for variant in t['variants'] ])
-    for tx in coverage_data:
-        if gene_variants:
-            tx['coverage'] = len(tx['variants'])/len(gene_variants)
-            tx['clinvar_coverage'] = round(tx["coverage"]*100, 3) if tx["coverage"] else None
-            tx['clinvar_variants'] = len(tx["variants"]),
-        else:
-            tx['coverage'] = None
-    return coverage_data
-'''
 def annotate_transcripts(gene_data):
     transcripts = []
     MANE_list_df = get_MANE_list()
