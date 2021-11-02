@@ -23,7 +23,7 @@ def download(url: str, dest_folder: str):
     else:  # HTTP status code 4XX/5XX
         print("Download failed: status code {}\n{}".format(r.status_code, r.text))
 
-if os.path(cur_path + '/Clinvar').is_dir():
+if os.path.exists(cur_path + '/Clinvar'):
     pass
 else:
     os.mkdir(cur_path + '/Clinvar')
