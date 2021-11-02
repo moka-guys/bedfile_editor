@@ -4,6 +4,35 @@ import sys, os
 import pandas as pd
 
 cur_path = os.getcwd() 
+def download(url: str, dest_folder: str):
+    if not os.path.exists(dest_folder):
+        os.makedirs(dest_folder)  # create folder if it does not exist
+
+    filename = url.split('/')[-1].replace(" ", "_")  # be careful with file names
+    file_path = os.path.join(dest_folder, filename)
+
+    r = requests.get(url, stream=True)
+    if r.ok:
+        print("saving to", os.path.abspath(file_path))
+        with open(file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024 * 8):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+                    os.fsync(f.fileno())
+    else:  # HTTP status code 4XX/5XX
+        print("Download failed: status code {}\n{}".format(r.status_code, r.text))
+
+
+if os.path.exists(cur_path + '/bed_maker/Clinvar/clinvar.vcf.gz'):
+    pass
+else: 
+    download("https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz", dest_folder=cur_path+"/bed_maker/Clinvar")
+if os.path.exists(cur_path + '/bed_maker/Clinvar/clinvar.vcf.gz.tbi'):
+    pass
+else:
+    download("https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz.tbi", dest_folder=cur_path+"/bed_maker/Clinvar")
+
 vcfReader = vcf.Reader(filename=cur_path+'/bed_maker/Clinvar/clinvar.vcf.gz', compressed=True)
 
 def get_MANE_list():
