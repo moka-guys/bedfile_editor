@@ -11,8 +11,7 @@ db.sqlite3
 db.sqlite3-journal
 media
 sent_emails
-clinvar.vcf.gz
-clinvar.vcg.gz.tbi
+Clinvar
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.

@@ -5,7 +5,7 @@ from .forms import ManualUploadForm
 from .models import *
 import datetime
 import requests, sys
-from bed_maker.Clinvar.clinvar_coverage import annotate_transcripts,  lookup_ensembl_gene
+from bed_maker.clinvar_coverage import annotate_transcripts,  lookup_ensembl_gene
 
 
 # Create your views here.
