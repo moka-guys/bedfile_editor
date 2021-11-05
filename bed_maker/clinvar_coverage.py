@@ -2,15 +2,16 @@ import vcf
 import requests
 import sys, os
 import pandas as pd
+from config.settings import BASE_DIR
 
-cur_path = os.getcwd() 
+cur_path = BASE_DIR
 '''
 Get path to Clinvar folder to calculate Clinvar Coverage
 '''
 
 def download(url: str, dest_folder: str):
     '''
-    Download function for Clinvar vcf files
+    Download function for Clinvar vcf files if not already present
     '''
     if not os.path.exists(dest_folder):
         os.makedirs(dest_folder)  # create folder if it does not exist
