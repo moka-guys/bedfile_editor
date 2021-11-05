@@ -4,7 +4,14 @@ import sys, os
 import pandas as pd
 
 cur_path = os.getcwd() 
+'''
+Get path to Clinvar folder to calculate Clinvar Coverage
+'''
+
 def download(url: str, dest_folder: str):
+    '''
+    Download function for Clinvar vcf files
+    '''
     if not os.path.exists(dest_folder):
         os.makedirs(dest_folder)  # create folder if it does not exist
 
@@ -89,7 +96,9 @@ def lookup_ensembl_gene(ensembl_gene_id):
     return(decoded)
 
 def get_transcript_intervals(transcript): 
-    #decoded = lookup_ensembl_gene(Ensembl_transcript_id)
+    '''
+    Get a list of chromosomal coordinates for the exons
+    '''
     intervals = []
     for Exon in transcript['Exon']:
         chr = Exon['seq_region_name']
@@ -100,6 +109,9 @@ def get_transcript_intervals(transcript):
     return intervals
 
 def get_variants(intervals):
+    '''
+    Get the list of variants for the exon regions of each transcript
+    '''
     result = set()
     for interval in intervals:
         chrom, start, end = interval
@@ -108,6 +120,10 @@ def get_variants(intervals):
     return list(result)
 
 def annotate_transcripts(gene_data):
+    '''
+    Annotate the transcripts with information, such as Clivar Coverage,
+    if MANE transcript and get the corresponding transcript RefSeq ID.
+    '''
     transcripts = []
     MANE_list_df = get_MANE_list()
     ClinvarDetails = vcfReader.metadata['fileDate'] + ' ' + vcfReader.metadata['reference']
