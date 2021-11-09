@@ -37,3 +37,7 @@ class Transcript(models.Model):
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
+    coverage = models.CharField(max_length=20)
+    clinvar_coverage = models.CharField(max_length=10)
+    clinvar_variants = models.CharField(max_length=50)
+    clinvar_details = models.CharField(max_length=50)
