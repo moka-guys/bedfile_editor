@@ -5,7 +5,8 @@ from .forms import ManualUploadForm
 from .models import *
 import datetime
 import requests, sys
-import pandas as pd
+from bed_maker.clinvar_coverage import annotate_transcripts,  lookup_ensembl_gene
+
 
 # Create your views here.
 def home(request):
@@ -18,54 +19,6 @@ def view(request):
     transcript_list = Transcript.objects.all()
 
     return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
-
-def get_MANE_list():
-    '''
-    Get a JSON of MANE transcripts via the TARK API and return it as a Pandas Dataframe.
-    MANE transcripts are minimal set of matching RefSeq and Ensembl transcripts of human
-    protein-coding genes, where the transcripts from a matched pair are identical
-    (5’ UTR, coding region and 3’ UTR), but retain their respective identifiers.
-
-    The MANE transcript set is classified into two groups:
-
-    1) MANE Select: One high-quality representative transcript per protein-coding gene that is well-supported by 
-    experimental data and represents the biology of the gene.
-    2) MANE Plus Clinical: Transcripts chosen to supplement MANE Select when needed for clinical variant reporting.
-    '''
-    server = "http://dev-tark.ensembl.org"
-
-    ext = f"/api/transcript/manelist/"
-    
-    r = requests.get(server+ext, headers={ "Content-Type" : "text/html"})
-    
-    # Send informative error message if bad request returned 
-    if not r.ok:
-        r.raise_for_status()
-        sys.exit()
-    
-    decoded = r.json()
-    # ens_stable_id, ens_stable_id_version, refseq_stable_id, refseq_stable_id_version, mane_type, ens_gene_name
-    MANE_list_df = pd.DataFrame(decoded) 
-    
-    return(MANE_list_df)  
-
-def lookup_ensembl_gene(ensembl_gene_id):
-    '''
-    Get transcripts related to Ensembl Gene ID from the Ensembl REST API
-    '''
-    server = "https://rest.ensembl.org"
-
-    ext = f"/lookup/id/{ensembl_gene_id}?expand=1&utr=1"
-    
-    r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
-    
-    # Send informative error message if bad request returned 
-    if not r.ok:
-        r.raise_for_status()
-        sys.exit()
-    
-    decoded = r.json()
-    return(decoded)
 
 def manual_import(request):
     """
@@ -104,9 +57,6 @@ def manual_import(request):
             )
 
             # Use the TARK API to get most recent version of the MANE transcript list
-
-            MANE_list_df = get_MANE_list()
-
             # Get Gene list - Gene objects is defined in models.py - it populates the data into the 
             # genes table for every BedfileRequest made.
             # List comprehension to split lines input by user into a list and trim any white space
@@ -118,17 +68,12 @@ def manual_import(request):
                 )
                 # Populate database with transcript details for each gene using Ensembl API
                 gene_object = lookup_ensembl_gene(gene_ID)
-                for transcript_dict in gene_object["Transcript"]:
+
+                transcripts_annotated = annotate_transcripts(gene_object)
+                
+                for transcript_dict in transcripts_annotated:
                     # check if the Transcript ID is present in a list of all MANE transcripts, if it does it allocates True to the field MANE_transcript 
                     # and adds the appropriate RefSeq ID to the field
-                    if transcript_dict["id"] in MANE_list_df.ens_stable_id.values:
-                        MANE_transcript = 'True'
-                        RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript_dict["id"]]['refseq_stable_id'].item()
-                        RefSeq_transcript_version = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript_dict["id"]]['refseq_stable_id_version'].item()
-                    else:
-                        MANE_transcript = 'False'
-                        RefSeq_transcript_id = ''
-                        RefSeq_transcript_version = ''
                     transcript = Transcript.objects.create(
                     ensembl_transcript_id = transcript_dict["id"],
                     ensembl_transcript_version = transcript_dict["version"],
@@ -137,11 +82,12 @@ def manual_import(request):
                     display_name = transcript_dict["display_name"],
                     start = transcript_dict["start"],
                     end = transcript_dict["end"],
-                    MANE_transcript = MANE_transcript,
-                    RefSeq_transcript_id = RefSeq_transcript_id,
-                    RefSeq_transcript_version = RefSeq_transcript_version,
-                    RefSeq_HGMD_transcript = False,
-                    clinvar_variant_coverage = 100,
+                    MANE_transcript = transcript_dict['MANE_transcript'],
+                    RefSeq_transcript_id = transcript_dict['RefSeq_transcript_id'],
+                    coverage = round(transcript_dict['coverage'], 8),
+                    clinvar_coverage = transcript_dict['clinvar_coverage'],
+                    clinvar_variants = transcript_dict['clinvar_variants'] if transcript_dict['clinvar_variants'] else None,
+                    clinvar_details = transcript_dict['clinvar_details'],
                     biotype = gene_object["biotype"],
                     )
             # add success message to page

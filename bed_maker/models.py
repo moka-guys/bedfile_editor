@@ -49,8 +49,11 @@ class Transcript(models.Model):
     end = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
     RefSeq_HGMD_transcript = models.BooleanField(default=False)
-    clinvar_variant_coverage = models.FloatField(default=0)
     biotype = models.CharField(max_length=21, default="")
+    coverage = models.CharField(max_length=20)
+    clinvar_coverage = models.CharField(max_length=10)
+    clinvar_variants = models.CharField(max_length=50)
+    clinvar_details = models.CharField(max_length=50)
     
 class SelectedTranscript(models.Model):
     """
@@ -65,3 +68,4 @@ class SelectedTranscript(models.Model):
     include_three_prime_UTR = models.BooleanField(default=False)
     five_prime_UTR_padding = models.IntegerField(default=False)
     three_prime_UTR_padding = models.IntegerField(default=False)
+

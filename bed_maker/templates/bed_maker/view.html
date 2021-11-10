@@ -12,6 +12,7 @@
             <th>Transcript</th>
             <th>Start</th>
             <th>End</th>
+            <th>Clinvar coverage</th>
             <th>MANE Transcript?</th>
             <th>RefSeq stable ID</th>
             <th>RefSeq HGMD transcript?</th>
@@ -26,19 +27,17 @@
             <td>{{ var.ensembl_transcript_id}}.{{ var.ensembl_transcript_version}}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
+            <td>{{ var.clinvar_variants }} / {{ var.clinvar_coverage }}%</td>
             <td>{{ var.MANE_transcript }}</td>
             <td>{{ var.RefSeq_transcript_id}}.{{var.RefSeq_transcript_version}}</td>
             <td>{{ var.RefSeq_HGMD_transcript }}</td>
             <td>{{ var.clinvar_variant_coverage }}</td>
             <td>{{ var.biotype }}</td>
-
           </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <th></th>
-            <th></th>
             <th></th>
             <th></th>
             <th></th>
@@ -84,9 +83,6 @@
                     }
                 } );
             } );
-        
-        
         });
         </script>
-
     {% endblock %}
