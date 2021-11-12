@@ -1,5 +1,6 @@
 {% extends 'bed_maker/base.html' %}
 {% block content %}
+{% load mathfilters %}
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand">View transcripts</a>
     </nav>
@@ -12,10 +13,9 @@
             <th>Transcript</th>
             <th>Start</th>
             <th>End</th>
-            <th>Clinvar coverage</th>
-            <th>MANE Transcript?</th>
+            <th>Is MANE Transcript?</th>
             <th>RefSeq stable ID</th>
-            <th>RefSeq HGMD transcript?</th>
+            <th>Is RefSeq HGMD transcript?</th>
             <th>% ClinVar Variants Covered</th>
             <th>Coding transcript?</th>
           </tr>
@@ -27,18 +27,16 @@
             <td>{{ var.ensembl_transcript_id}}.{{ var.ensembl_transcript_version}}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
-            <td>{{ var.clinvar_variants }} / {{ var.clinvar_coverage }}%</td>
             <td>{{ var.MANE_transcript }}</td>
             <td>{{ var.RefSeq_transcript_id}}.{{var.RefSeq_transcript_version}}</td>
             <td>{{ var.RefSeq_HGMD_transcript }}</td>
-            <td>{{ var.clinvar_variant_coverage }}</td>
+            <td>{{ var.clinvar_coverage|mul:100|floatformat:2}}%
             <td>{{ var.biotype }}</td>
           </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <th></th>
             <th></th>
             <th></th>
             <th></th>

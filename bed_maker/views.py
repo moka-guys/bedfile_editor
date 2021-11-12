@@ -75,8 +75,8 @@ def manual_import(request):
                     # check if the Transcript ID is present in a list of all MANE transcripts, if it does it allocates True to the field MANE_transcript 
                     # and adds the appropriate RefSeq ID to the field
                     transcript = Transcript.objects.create(
-                    ensembl_transcript_id = transcript_dict["id"],
-                    ensembl_transcript_version = transcript_dict["version"],
+                    ensembl_transcript_id = transcript_dict["ensembl_transcript_id"],
+                    ensembl_transcript_version = transcript_dict["ensembl_transcript_version"],
                     bedfile_request_id = bedfile_request,
                     gene_id = gene,
                     display_name = transcript_dict["display_name"],
@@ -84,9 +84,11 @@ def manual_import(request):
                     end = transcript_dict["end"],
                     MANE_transcript = transcript_dict['MANE_transcript'],
                     RefSeq_transcript_id = transcript_dict['RefSeq_transcript_id'],
-                    coverage = round(transcript_dict['coverage'], 8),
-                    clinvar_coverage = transcript_dict['clinvar_coverage'],
-                    clinvar_variants = transcript_dict['clinvar_variants'] if transcript_dict['clinvar_variants'] else None,
+                    RefSeq_transcript_version = transcript_dict['RefSeq_transcript_version'],
+                    #coverage = round(transcript_dict['coverage'], 8),
+                    coverage = transcript_dict['coverage'],
+                    clinvar_coverage = transcript_dict['coverage'],
+                    clinvar_variants = transcript_dict['variants'] if transcript_dict['variants'] else None,
                     clinvar_details = transcript_dict['clinvar_details'],
                     biotype = gene_object["biotype"],
                     )

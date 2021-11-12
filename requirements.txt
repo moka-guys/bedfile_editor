@@ -1,6 +1,7 @@
 dj-database-url
 django
 django-crispy-forms
+django-mathfilters
 environs
 gunicorn
 pandas

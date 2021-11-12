@@ -133,22 +133,26 @@ def annotate_transcripts(gene_data):
         if transcript["id"] in MANE_list_df.ens_stable_id.values:
             MANE_transcript = 'True'
             RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript["id"]]['refseq_stable_id'].item()
+            RefSeq_transcript_version = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == transcript["id"]]['refseq_stable_id_version'].item()
         else:
             MANE_transcript = 'False'
-            RefSeq_transcript_id = ''            
+            RefSeq_transcript_id = ''
+            RefSeq_transcript_version = ''
 
         transcript_intervals = get_transcript_intervals(transcript)
             # exclude haplotypes (as not in clinvar)
         transcript_intervals = list([ i for i in transcript_intervals if 'hap' not in i[0] ])
             # build result dict
         transcripts.append({
-            'id': transcript['id'],
+            'ensembl_transcript_id': transcript['id'],
+            'ensembl_transcript_version': transcript["version"],
             'display_name' : transcript['display_name'],
             'variants': get_variants(transcript_intervals) if transcript_intervals else [],
             'coding': bool(transcript_intervals),
             'clinvar_details': ClinvarDetails,
             'MANE_transcript': MANE_transcript,
             'RefSeq_transcript_id': RefSeq_transcript_id,
+            'RefSeq_transcript_version': RefSeq_transcript_version,
             'start': transcript["start"],
             'end' : transcript["end"]
         })

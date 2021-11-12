@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bed_maker',
+    'mathfilters',
     'crispy_forms',
     'whitenoise.runserver_nostatic',
     'Profiles',
