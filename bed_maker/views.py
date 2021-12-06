@@ -105,6 +105,8 @@ def manual_import(request):
                     clinvar_variants = transcript_dict['variants'] if transcript_dict['variants'] else None,
                     clinvar_details = transcript_dict['clinvar_details'],
                     biotype = gene_object["biotype"],
+                    recommended_transcript = transcript_dict['MANE_transcript'],
+                    selected_transcript = transcript_dict['MANE_transcript'],
                     )
             # add success message to page
             context['message'] = ['Gene list was uploaded successfully']
