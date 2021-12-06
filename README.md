@@ -4,6 +4,8 @@ A Django-based webtool for creating and viewing bedfiles used in clinical diagno
 
 ## What does this app do?
 
+bedfile_editor/bed_maker/user_guides/user_guide.md
+bedfile_editor/bed_maker/user_guides/developer_guide.md
 ## What are typical use cases for this app?
 
 ## What data are required for this app to run?
