@@ -6,11 +6,16 @@ from .models import *
 import datetime
 import requests, sys
 from bed_maker.clinvar_coverage import annotate_transcripts,  lookup_ensembl_gene
+import markdown2
 
 
 # Create your views here.
 def home(request):
-    return render(request, 'bed_maker/home.html', {})
+    with open('bed_maker/user_guides/user_guide.md') as f:
+        markdown = f.read()
+    return render(request, 'bed_maker/home.html', {
+        "content": markdown2.markdown(markdown) 
+    })
 
 def view(request):
     """
@@ -19,6 +24,14 @@ def view(request):
     transcript_list = Transcript.objects.all()
 
     return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
+
+def edit(request):
+    """
+    Edit Bedfile requests
+    """
+    transcript_list = Transcript.objects.all()
+
+    return render(request, 'bed_maker/edit.html', {'transcripts': transcript_list})
 
 def manual_import(request):
     """
@@ -63,8 +76,9 @@ def manual_import(request):
             gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
             for gene_ID in gene_list:
                 gene = Gene.objects.create(
-                ensembl_gene_id = gene_ID,
+                ensembl_id = gene_ID,
                 bedfile_request_id = bedfile_request,
+                display_name = 'placeholder',
                 )
                 # Populate database with transcript details for each gene using Ensembl API
                 gene_object = lookup_ensembl_gene(gene_ID)
@@ -75,7 +89,7 @@ def manual_import(request):
                     # check if the Transcript ID is present in a list of all MANE transcripts, if it does it allocates True to the field MANE_transcript 
                     # and adds the appropriate RefSeq ID to the field
                     transcript = Transcript.objects.create(
-                    ensembl_transcript_id = transcript_dict["ensembl_transcript_id"],
+                    ensembl_id = transcript_dict["ensembl_id"],
                     ensembl_transcript_version = transcript_dict["ensembl_transcript_version"],
                     bedfile_request_id = bedfile_request,
                     gene_id = gene,
