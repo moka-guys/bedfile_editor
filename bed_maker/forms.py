@@ -22,8 +22,8 @@ class ManualUploadForm(forms.Form):
     request_exon_padding = forms.IntegerField(label = "Exon Padding")
     request_five_prime_UTR= forms.BooleanField(label = "Include 5' UTR", initial=False, required=False)
     request_three_prime_UTR= forms.BooleanField(label = "Include 3' UTR", initial=False, required=False)
-    request_five_prime_UTR_padding = forms.IntegerField(label = "Padding for 5' UTR")
-    request_three_prime_UTR_padding = forms.IntegerField(label = "Padding for 3' UTR")
+    request_five_prime_UTR_padding = forms.IntegerField(label = "5' UTR Padding", widget=forms.TextInput(attrs={'style':'max-width: 20em'}),)
+    request_three_prime_UTR_padding = forms.IntegerField(label = "3' UTR Padding", widget=forms.TextInput(attrs={'style':'max-width: 20em'}),)
     panel_category = forms.CharField()
     panel_subcategory = forms.CharField()
     panel_name = forms.CharField()
@@ -75,10 +75,11 @@ class ManualUploadForm(forms.Form):
                 ),
                 AccordionGroup('Select Untranslated Regions',
                     Row(
-                        Column(Field('request_transcript_padding', value=0)),
                         Column(Field('request_exon_padding', value=0)),
                         ),
+                    Row(
                         Field('request_introns', placeholder="Should Introns be included"),
+                    ),
                         Row(
                         Column(Field('request_five_prime_UTR', placeholder="Include 5' UTR")),
                         Column(Field('request_five_prime_UTR_padding', value=0)),
