@@ -22,14 +22,21 @@ class BedfileRequest(models.Model):
     panel_subcategory = models.CharField(max_length=25, default="")
     panel_name = models.CharField(max_length=25, default="")
 
+    def __str__(self):
+        return f'{self.pan_number}'
+
 class Gene(models.Model):
     """
     Model to store gene details
     """
     gene_id = models.AutoField(primary_key=True)
     # ensembl gene ID begining ENSG
-    ensembl_gene_id = models.CharField(max_length=15)
+    display_name = models.CharField(max_length=15, default="placeHolder")
+    ensembl_id = models.CharField(max_length=15)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.ensembl_id}'
 
 class Transcript(models.Model):
     """
@@ -37,13 +44,14 @@ class Transcript(models.Model):
     """
     transcript_id = models.AutoField(primary_key=True)
     # ensembl transcript ID begining ENST
-    ensembl_transcript_id = models.CharField(max_length=15)
+    ensembl_id = models.CharField(max_length=15)
     ensembl_transcript_version = models.CharField(max_length=3, default="")
     # RefSeq transcript ID begining NM
     RefSeq_transcript_id = models.CharField(max_length=15)
     RefSeq_transcript_version = models.CharField(max_length=3, default="")
-    bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE)
-    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE)
+    bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
+    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE,  related_name='gene_transcripts',)
+    chromosome=models.CharField(max_length=2)
     display_name = models.CharField(max_length=15)
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
@@ -54,18 +62,9 @@ class Transcript(models.Model):
     clinvar_coverage = models.CharField(max_length=10)
     clinvar_variants = models.CharField(max_length=50)
     clinvar_details = models.CharField(max_length=50)
-    
-class SelectedTranscript(models.Model):
-    """
-    Model to store transcript details
-    """ 
-    selected_transcript_id = models.AutoField(primary_key=True)   
-    transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE)
-    transcript_padding = models.IntegerField(default=0)
-    include_introns = models.BooleanField(default=False)
-    exon_padding = models.IntegerField(default=0)
-    include_five_prime_UTR = models.BooleanField(default=False)
-    include_three_prime_UTR = models.BooleanField(default=False)
-    five_prime_UTR_padding = models.IntegerField(default=False)
-    three_prime_UTR_padding = models.IntegerField(default=False)
+    recommended_transcript = models.BooleanField(default=False)
+    selected_transcript = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.ensembl_id}'
 
