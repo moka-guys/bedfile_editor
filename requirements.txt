@@ -4,8 +4,10 @@ django-crispy-forms
 django-mathfilters
 environs
 gunicorn
+markdown2
 pandas
 psycopg2
+pybedtools
 requests
 whitenoise
 pyvcf
