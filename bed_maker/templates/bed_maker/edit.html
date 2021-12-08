@@ -1,9 +1,17 @@
+
+{% extends 'bed_maker/base.html' %}
 {% load static %}
 {% load mathfilters %}
+{% block content %}
 
-<html>
+    <!-- Bootstrap and datatables CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static "DataTables/Bootstrap-4-4.1.1/css/bootstrap.min.css" %}"/>
+      <!-- js Deliver CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-<head>
+    
+
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,78 +22,6 @@
     <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
 
-    <title>Bedfile Maker</title>
-</head>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
-    <a class="navbar-brand" href="#">BedfileMaker<sup>2</sup></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
-        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarText">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'home' %}">Home</a>
-            </li>
-            {% if request.user.is_authenticated %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'manual_import' %}">Import</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view' %}">View</a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'edit' %}">Edit</a>
-            </li>
-
-            {% endif %}
-        </ul>
-
-        <ul class="nav navbar-nav navbar-right">
-
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                    aria-expanded="false"> Account <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    {% if request.user.is_authenticated %}
-                    <li><a>
-                            <div>
-                                <strong>Logged in email:</strong>
-                                <small>{{request.user.email}}</small>
-                            </div>
-                        </a></li>
-                    <li><a class="btn btn-outline-primary m-2" href="{% url 'logout' %}">Logout</a></li>
-                    <li><a class="btn btn-outline-primary m-2" href="{% url 'password_change' %}">Change Password</a>
-                    </li>
-
-                    {% else %}
-                    <li role="separator" class="divider"></li>
-                    <li><a class="btn btn-outline-primary m-2" href="{% url 'login' %}">Login</a></li>
-                    <li><a class="btn btn-outline-primary m-2" href="{% url 'password_reset' %}">Reset Password</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a class="btn btn-outline-primary m-2" href="{% url 'signup' %}">SIGN-UP</a></li>
-                    {% endif %}
-
-
-                </ul>
-            </li>
-        </ul>
-        <nav class="navbar navbar-default">
-            <div class="container-fluid"></div>
-
-            <a class="navbar-brand">
-                <img alt="Logo" src="{% static 'logo2.jpg' %}" width="40" height="40">
-            </a>
-
-    </div>
-</nav>
-
-</div>
-</nav>
 <br>
 <div class="container">
     <!-- Content here -->
@@ -133,6 +69,19 @@
         }
     }
 
+    //function to dynamically sispaly clinvar coverage as %  
+    var convertToPercentage = function(value, data, type, params, component){
+        //change age value into boolean, true if over the provided legal age
+        if(data["transcript_id"]){
+            percentage_coverage = value * 100;    
+            return percentage_coverage.toFixed(2);
+        }
+        else {
+            return value;
+        }
+    }
+ 
+
     //initialize table
     var table = new Tabulator("#transcripts-table", {
         height: "550px",
@@ -147,13 +96,14 @@
             { title: "Name", field: "display_name", responsive: 0, frozen:true, width:100,}, //never hide this column
             { title: "Suggested", field: "recommended_transcript", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", frozen:true, headerVertical:true, headerTooltip:"Recommended as clinically relevant transcript as per 4 prioritization rules outlined in the User Guide"},
             { title: "Selected", field: "selected_transcript", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, frozen:true,  headerVertical:true, headerTooltip:"If selected then this transcript will be included in any bed file created"},           
+            { title: "Chr", field: "chromosome", width:75,},
             { title: "Start", field: "start", width:100,},
             { title: "End", field: "end", width:100,},
             { title: "MANE", field: "MANE_transcript", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", headerVertical:true, headerTooltip:"Subset of RefSeq Select transcripts categorized as MANE, which are agreed upon as representative by both NCBI RefSeq and Ensembl/GENCODE, and have a 100% identical match to a transcript in the Ensembl annotation."},
             { title: "RefSeq ID", field: "RefSeq_transcript_id", mutator:addVersionToRefSeqID, width:100,},
             { title: "HGMD", field: "RefSeq_HGMD_transcript", hozAlign: "center",formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", headerVertical:true,headerTooltip:"Subset of RefSeq Curated, transcripts annotated by the Human Gene Mutation Database."},
             { title: "biotype", field: "biotype", hozAlign: "center", headerVertical:true, width:130, headerTooltip:"Protein Coding, a transcipt that contains an open reading frame (ORF)."},
-            { title: "% ClinVar", field: "clinvar_percentage", }, 
+            { title: "% ClinVar", field: "clinvar_coverage", mutator:convertToPercentage, headerTooltip:"The % of ClinVar variants in gene covered by the transcript."}, 
             { title: "Exon Padding", field: "exon_padding", hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad exons (Integer)",},
             { title: "Introns?", field: "include_introns", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include introns",},
             { title: "5' UTR?", field: "include_5utr", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include 5' UTR",},
@@ -167,4 +117,4 @@
 </div>
 </body>
 
-</html>
+{% endblock %}
