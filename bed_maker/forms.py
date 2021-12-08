@@ -69,10 +69,9 @@ class ManualUploadForm(forms.Form):
                     Field('panel_name', placeholder="Enter Panel Name"),
                     Field('date_requested', placeholder="Enter date Panel requested" ),
                     Field('requested_by', placeholder="Enter requester's name"),                         
-                ),
-                AccordionGroup('Enter Ensembl Gene List',
+                    HTML('<br><h5>Enter Ensembl Gene List</h5>'),
                     Field('gene_list', placeholder="Enter Ensembl Gene IDs beginning ENSG i.e.\nENSG00000012048\nENSG00000141510\nENSG00000146648"),
-                    HTML('<br>Sample set:<br>ENSG00000012048<br>ENSG00000141510<br>ENSG00000146648<br>'),                         
+                    HTML('<br>Sample set:<br>ENSG00000012048<br>ENSG00000141510<br>ENSG00000146648<br>'),
                 ),
                 AccordionGroup('Select Untranslated Regions',
                     Row(
@@ -92,9 +91,6 @@ class ManualUploadForm(forms.Form):
                 AccordionGroup('Manually Enter Genomic Regions',
                             Field('genome_ref_select'),
                             Field('region_list', placeholder="Enter additional genomic regions (ID,Chr,Start,End)\nRegion1,3,100000,200000 \nRegion2,11,180000,200000"),
-                    ),
-                AccordionGroup('Select Output BED file format',
-                            Field('bedfile_select'),
                     )
             ),
         )
