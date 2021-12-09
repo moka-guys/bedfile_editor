@@ -61,7 +61,7 @@ class ManualUploadForm(forms.Form):
         self.helper.layout = Layout(
     
             Accordion(
-                AccordionGroup('Bedfile Request',
+                AccordionGroup('Bedfile Request & Gene List',
                     Field('pan_number', placeholder="Enter new Pan number for this panel"),
                     HTML('<br><h5>Panel Description</h5>'),
                     Field('panel_category', placeholder="Enter Panel Category"),
@@ -73,7 +73,7 @@ class ManualUploadForm(forms.Form):
                     Field('gene_list', placeholder="Enter Ensembl Gene IDs beginning ENSG i.e.\nENSG00000012048\nENSG00000141510\nENSG00000146648"),
                     HTML('<br>Sample set:<br>ENSG00000012048<br>ENSG00000141510<br>ENSG00000146648<br>'),
                 ),
-                AccordionGroup('Select Untranslated Regions',
+                AccordionGroup('Select Untranslated Regions & Set Padding',
                     Row(
                         Column(Field('request_exon_padding', value=0)),
                         ),
