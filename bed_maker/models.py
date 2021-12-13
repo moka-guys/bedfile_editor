@@ -83,3 +83,18 @@ class Exon(models.Model):
 
     def __str__(self):
         return f'{self.ensembl_id}'
+
+class UTR(models.Model):
+    """
+    Model to store exon details
+    """
+    utr_id = models.AutoField(primary_key=True)
+    # ensembl transcript ID begining ENST
+    start = models.CharField(max_length=50)
+    end = models.CharField(max_length=50)
+    bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
+    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE,  related_name='gene_utrs',)
+    transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE,)
+
+    def __str__(self):
+        return f'{self.ensembl_id}'
