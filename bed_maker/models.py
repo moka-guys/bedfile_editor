@@ -68,3 +68,18 @@ class Transcript(models.Model):
     def __str__(self):
         return f'{self.ensembl_id}'
 
+class Exon(models.Model):
+    """
+    Model to store exon details
+    """
+    exon_id = models.AutoField(primary_key=True)
+    # ensembl transcript ID begining ENST
+    ensembl_id = models.CharField(max_length=15)
+    start = models.CharField(max_length=50)
+    end = models.CharField(max_length=50)
+    bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
+    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE,  related_name='gene_transcripts',)
+    transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE,)
+
+    def __str__(self):
+        return f'{self.ensembl_id}'

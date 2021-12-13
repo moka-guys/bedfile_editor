@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(BedfileRequest)
 admin.site.register(Gene)
 admin.site.register(Transcript)
+admin.site.register(Exon)
