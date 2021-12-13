@@ -78,7 +78,7 @@ class Exon(models.Model):
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
-    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE,  related_name='gene_transcripts',)
+    gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE,  related_name='gene_exons',)
     transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE,)
 
     def __str__(self):
