@@ -3,6 +3,11 @@
 {% load static %}
 {% load mathfilters %}
 {% block content %}
+{% load crispy_forms_tags %}
+
+
+
+
 
     <!-- Bootstrap and datatables CSS -->
     <link rel="stylesheet" type="text/css" href="{% static "DataTables/Bootstrap-4-4.1.1/css/bootstrap.min.css" %}"/>
@@ -29,6 +34,8 @@
         <a class="navbar-brand">Edit Bedfile Requests</a>
     </nav>
     <br>
+
+    {% crispy selected_form %}
 
     <div id="transcripts-table"></div>
 
@@ -69,7 +76,7 @@
         }
     }
 
-    //function to dynamically sispaly clinvar coverage as %  
+    //function to dynamically display clinvar coverage as %  
     var convertToPercentage = function(value, data, type, params, component){
         //change age value into boolean, true if over the provided legal age
         if(data["transcript_id"]){
@@ -104,12 +111,13 @@
             { title: "HGMD", field: "RefSeq_HGMD_transcript", hozAlign: "center",formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", headerVertical:true,headerTooltip:"Subset of RefSeq Curated, transcripts annotated by the Human Gene Mutation Database."},
             { title: "biotype", field: "biotype", hozAlign: "center", headerVertical:true, width:130, headerTooltip:"Protein Coding, a transcipt that contains an open reading frame (ORF)."},
             { title: "% ClinVar", field: "clinvar_coverage", mutator:convertToPercentage, headerTooltip:"The % of ClinVar variants in gene covered by the transcript."}, 
-            { title: "Exon Padding", field: "exon_padding", hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad exons (Integer)",},
+            { title: "Transcript Padding", field: "transcript_padding", hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad exons (Integer)",},
+            { title: "Exon Padding", field: "include_exon_padding", hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad exons (Integer)",},
             { title: "Introns?", field: "include_introns", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include introns",},
-            { title: "5' UTR?", field: "include_5utr", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include 5' UTR",},
-            { title: "3' UTR?", field: "include_3utr", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include 3' UTR",},
-            { title: "5' UTR padding", field: "padding_5utr",  hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad upstream of 5' UTR (Integer)"},
-            { title: "3' UTR padding", field: "padding_3utr",  hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad downstream of 3' UTR (Integer)"},
+            { title: "5' UTR?", field: "include_five_prime_UTR", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include 5' UTR",},
+            { title: "3' UTR?", field: "include_three_prime_UTR", hozAlign: "center", formatter: "tickCross", formatterParams:{ allowEmpty:true,}, sorter: "boolean", editor: true, headerVertical:true, headerTooltip:"Include 3' UTR",},
+            { title: "5' UTR padding", field: "five_prime_UTR_padding",  hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad upstream of 5' UTR (Integer)"},
+            { title: "3' UTR padding", field: "three_prime_UTR_padding",  hozAlign: "center", editor: true, headerVertical:true, headerTooltip:"Base pairs to pad downstream of 3' UTR (Integer)"},
             
         ],
     });
@@ -118,3 +126,5 @@
 </body>
 
 {% endblock %}
+
+

@@ -1,6 +1,17 @@
 {% extends 'bed_maker/base.html' %}
+
+{% load static %}
+
+    <title>Bedfile Maker</title>
+  </head>
+
+  <body>
+
 {% block content %}
 {% load mathfilters %}
+
+
+
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand">View transcripts</a>
     </nav>
@@ -18,13 +29,15 @@
             <th>Is RefSeq HGMD transcript?</th>
             <th>% ClinVar Variants Covered</th>
             <th>Coding transcript?</th>
+            <th>Recommended transcript?</th>
+            <th>Selected for BedFile</th>
           </tr>
         </thead>
         <tbody>
           {% for var in transcripts %}
           <tr>
             <td>{{ var.display_name }}</td>
-            <td>{{ var.ensembl_transcript_id}}.{{ var.ensembl_transcript_version}}</td>
+            <td>{{ var.ensembl_id}}.{{ var.ensembl_transcript_version}}</td>
             <td>{{ var.start }}</td>
             <td>{{ var.end }}</td>
             <td>{{ var.MANE_transcript }}</td>
@@ -32,6 +45,8 @@
             <td>{{ var.RefSeq_HGMD_transcript }}</td>
             <td>{{ var.clinvar_coverage|mul:100|floatformat:2}}%
             <td>{{ var.biotype }}</td>
+            <td>{{ var.recommended_transcript}}</td>
+            <td>{{ var.selected_transcript}}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -43,20 +58,21 @@
             <th></th>
             <th></th>
             <th></th>
+            <th></th>
+            <th></th>
           </tr>
         </tfoot>
       </table>
-    
-    
-    <!-- Initialise DataTables-->
+
+    Initialise DataTables
     <script>
         $(document).ready(function(){
         
-         // Setup - add a text input to each footer cell
-            $('#transcripts tfoot th').each( function () {
-                var title = $(this).text();
-                $(this).html( '<input type="text" class="form-control" placeholder="Search '+title+'" />' );
-            } );
+        //  // Setup - add a text input to each footer cell
+        //     $('#transcripts tfoot th').each( function () {
+        //         var title = $(this).text();
+        //         $(this).html( '<input type="text" class="form-control" placeholder="Search '+title+'" />' );
+        //     } );
          
             // DataTable
               // Inititialise DataTable
@@ -64,7 +80,7 @@
             "paging":   true,
             "ordering": true,
             "info":     false,
-            "pageLength": 10,
+            "pageLength": 25,
             "searching": true,
             "aaSorting": [],
           });

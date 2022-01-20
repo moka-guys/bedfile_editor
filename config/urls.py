@@ -18,9 +18,12 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from Profiles import views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('bed_maker.urls')),
+    path('api/v1/', include('api.urls')),
+    path('export/', include('export_bedfile.urls')),
     #path('', include('Profiles.urls')),
     path('accounts', include('django.contrib.auth.urls')),
     path('signup/', views.signup, name='signup'),

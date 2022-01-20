@@ -2,6 +2,8 @@ import vcf
 import requests
 import sys, os
 import pandas as pd
+import pickle
+from collections import Counter
 from config.settings import BASE_DIR
 
 cur_path = BASE_DIR
@@ -45,7 +47,18 @@ if os.path.exists(cur_path + '/Clinvar/clinvar.vcf.gz.tbi'):
 else:
     download("https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz.tbi", dest_folder=cur_path+"/Clinvar")
 
-vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True)
+vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
+
+def count_clinvar_SNVs_per_gene(vcfReader_object):
+    '''count SNVs per gene symbol'''
+    gene_list = []
+    for record in vcfReader_object:
+        if 'GENEINFO' in  record.INFO.keys():
+            if record.INFO['CLNVC'] == 'single_nucleotide_variant':
+                gene_list.append(record.INFO['GENEINFO'].split(':')[0])
+    return Counter(gene_list)
+
+
 
 def get_MANE_list():
     '''
@@ -63,7 +76,6 @@ def get_MANE_list():
     server = "http://dev-tark.ensembl.org"
 
     ext = f"/api/transcript/manelist/"
-    
     r = requests.get(server+ext, headers={ "Content-Type" : "text/html"})
     
     # Send informative error message if bad request returned 
@@ -78,13 +90,13 @@ def get_MANE_list():
     return(MANE_list_df)  
 
 
-def lookup_ensembl_gene(ensembl_gene_id):
+def lookup_ensembl_gene(ensembl_id):
     '''
     Get transcripts related to Ensembl Gene ID from the Ensembl REST API
     '''
     server = "https://rest.ensembl.org"
 
-    ext = f"/lookup/id/{ensembl_gene_id}?expand=1&utr=1"
+    ext = f"/lookup/id/{ensembl_id}?expand=1&utr=1"
     
     r = requests.get(server+ext, headers={ "Content-Type" : "application/json"})
     
@@ -109,10 +121,23 @@ def get_transcript_intervals(transcript):
         intervals.append(interval)
     return intervals
 
-def get_variants(intervals):
+def get_variants_by_interval(intervals):
     '''
     Get the list of variants for the exon regions of each transcript
     '''
+    result = set()
+    for interval in intervals:
+        chrom, start, end = interval
+        for record in vcfReader.fetch(chrom,start,end):
+            if record.INFO['CLNVC'] == 'single_nucleotide_variant':
+                result.add(record.ID)  
+    return list(result)
+
+def get_variants_by_gene(intervals):
+    '''
+    Get the list of variants for by Gene
+    '''
+    # TODO Check if reference is 0 or 1 based
     result = set()
     for interval in intervals:
         chrom, start, end = interval
@@ -144,7 +169,7 @@ def annotate_transcripts(gene_data):
         transcript_intervals = list([ i for i in transcript_intervals if 'hap' not in i[0] ])
             # build result dict
         transcripts.append({
-            'ensembl_transcript_id': transcript['id'],
+            'ensembl_id': transcript['id'],
             'ensembl_transcript_version': transcript["version"],
             'display_name' : transcript['display_name'],
             'variants': get_variants(transcript_intervals) if transcript_intervals else [],
@@ -153,6 +178,7 @@ def annotate_transcripts(gene_data):
             'MANE_transcript': MANE_transcript,
             'RefSeq_transcript_id': RefSeq_transcript_id,
             'RefSeq_transcript_version': RefSeq_transcript_version,
+            'chromosome': transcript["seq_region_name"],
             'start': transcript["start"],
             'end' : transcript["end"]
         })

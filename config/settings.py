@@ -42,11 +42,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bed_maker',
-    'mathfilters',
-    'crispy_forms',
     'whitenoise.runserver_nostatic',
+
+    # 3rd Party Apps
+    'crispy_forms',
+    'mathfilters',
+    'rest_framework',
+    'django_filters',
+
+    #local
+    'api',
+    'bed_maker',
+    'edit_data',
+    'export_bedfile',
+    'get_data',
     'Profiles',
+
 ]
 
 MIDDLEWARE = [
@@ -150,3 +161,9 @@ EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 EMAIL_USE_TLS = True
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL')
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    #'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
+    
+}

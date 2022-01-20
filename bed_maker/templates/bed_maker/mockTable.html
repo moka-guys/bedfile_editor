@@ -1,0 +1,53 @@
+<script>
+
+
+    var tableDataNested = [
+        {
+
+            display_name: "", ensembl_id: "", start: "", end: "", MANE_transcript: "", RefSeq_transcript_id: "",
+            RefSeq_HGMD_transcript: "", clinvar_percentage: "", transcript_padding: "", include_introns: "", include_5utr: "",
+            include_3utr: "", padding_5utr: "", padding_3utr: "", recommended: "", selected: "", _children: [
+                {
+                    display_name: "", ensembl_id: "", start: "", end: "", MANE_transcript: "", RefSeq_transcript_id: "",
+                    RefSeq_HGMD_transcript: "", clinvar_percentage: "", transcript_padding: "", include_introns: "", include_5utr: "",
+                    include_3utr: "", padding_5utr: "", padding_3utr: "", recommended: "", selected: ""
+                },
+                {
+                    display_name: "", ensembl_id: "", start: "", end: "", MANE_transcript: "", RefSeq_transcript_id: "",
+                    RefSeq_HGMD_transcript: "", clinvar_percentage: "", transcript_padding: "", include_introns: "", include_5utr: "",
+                    include_3utr: "", padding_5utr: "", padding_3utr: "", recommended: "", selected: ""
+                },]
+         } 
+
+];
+
+    var table = new Tabulator("#example-table", {
+        height: "550px",
+        data: tableDataNested,
+        dataTree: true,
+        dataTreeStartExpanded: true,
+        layout: "fitColumns",      //fit columns to width of table
+        pagination: "local",       //paginate the data
+        paginationSize: 7,         //allow 7 rows per page of data
+        columns: [
+            { title: "Name", field: "display_name", responsive: 0, editor: true }, //never hide this column
+            { title: "Ensembl ID", field: "ensembl_id", editor: true },
+            { title: "Start", field: "start", editor: true },
+            { title: "End", field: "end", editor: true },
+            { title: "Is MANE Transcript?", field: "MANE_transcript", hozAlign: "center", formatter: "tickCross", sorter: "boolean" },
+            { title: "RefSeq stable ID", field: "RefSeq_transcript_id", editor: true }, //never hide this column
+            { title: "Is RefSeq HGMD transcript?", field: "RefSeq_HGMD_transcript", editor: true },
+            { title: "% ClinVar Variants Covered", field: "clinvar_percentage", editor: true }, //hide this column first
+            { title: "Transcript Padding", field: "transcript_padding", hozAlign: "center", editor: true },
+            { title: "Include Introns", field: "include_introns", hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true },
+            { title: "Include 5' UTR?", field: "include_5utr", hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true },
+            { title: "Include 3' UTR?", field: "include_3utr", hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true },
+            { title: "Include 5' padding", field: "padding_5utr", editor: true },
+            { title: "Include 3' padding", field: "padding_3utr", editor: true },
+            { title: "Recommended?", field: "recommended", hozAlign: "center", formatter: "tickCross", sorter: "boolean" },
+            { title: "Selected?", field: "selected", hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true },
+        ],
+    });
+
+
+</script>

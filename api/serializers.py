@@ -12,7 +12,7 @@ class TranscriptSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('transcript_id','ensembl_id',
     'ensembl_transcript_version', 'RefSeq_transcript_id',
-    'RefSeq_transcript_version', 'bedfile_request_id', 'gene_id', 'display_name', 'start', 'end', 'MANE_transcript', 'RefSeq_HGMD_transcript', 'biotype', 'coverage', 'clinvar_coverage', 'clinvar_variants', 'clinvar_details', 'recommended_transcript', 'selected_transcript',)
+    'RefSeq_transcript_version', 'bedfile_request_id', 'gene_id', 'display_name', 'chromosome', 'start', 'end', 'MANE_transcript', 'RefSeq_HGMD_transcript', 'biotype', 'coverage', 'clinvar_coverage', 'clinvar_variants', 'clinvar_details', 'recommended_transcript', 'selected_transcript', 'transcript_padding', 'include_introns', 'include_exon_padding', 'include_five_prime_UTR', 'include_three_prime_UTR','five_prime_UTR_padding', 'three_prime_UTR_padding')
         model = Transcript
 
 

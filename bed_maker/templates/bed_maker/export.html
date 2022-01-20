@@ -1,0 +1,23 @@
+{% extends 'bed_maker/base.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand">Export Bedfile</a>
+  </nav>
+  <br/>
+
+  <!-- Success message after export -->
+  {% if message %}
+    {% for m in message %}
+      <div class="alert alert-success">
+        <strong>Success!</strong> {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+    {% crispy export_form %}
+
+  
+
+    {% endblock %}

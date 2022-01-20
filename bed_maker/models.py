@@ -64,6 +64,13 @@ class Transcript(models.Model):
     clinvar_details = models.CharField(max_length=50)
     recommended_transcript = models.BooleanField(default=False)
     selected_transcript = models.BooleanField(default=False)
+    transcript_padding = models.IntegerField(default=0)
+    include_introns = models.BooleanField(default=False)
+    include_exon_padding = models.IntegerField(default=False)
+    include_five_prime_UTR= models.BooleanField(default=False)
+    include_three_prime_UTR= models.BooleanField(default=False)
+    five_prime_UTR_padding = models.IntegerField(default=0)
+    three_prime_UTR_padding = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.ensembl_id}'
@@ -75,6 +82,8 @@ class Exon(models.Model):
     exon_id = models.AutoField(primary_key=True)
     # ensembl transcript ID begining ENST
     ensembl_id = models.CharField(max_length=15)
+    ensembl_exon_version = models.CharField(max_length=3, default="")
+    chromosome=models.CharField(max_length=2)
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
@@ -90,11 +99,13 @@ class UTR(models.Model):
     """
     utr_id = models.AutoField(primary_key=True)
     # ensembl transcript ID begining ENST
+    ensembl_id = models.CharField(max_length=15)
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
     bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
     gene_id = models.ForeignKey('Gene', on_delete=models.CASCADE,  related_name='gene_utrs',)
     transcript_id = models.ForeignKey('Transcript', on_delete=models.CASCADE,)
+    utr_type = models.CharField(max_length=50)
 
     def __str__(self):
         return f'{self.ensembl_id}'
