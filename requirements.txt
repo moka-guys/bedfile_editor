@@ -8,7 +8,7 @@ environs
 gunicorn
 markdown2
 pandas
-pickle
+jsonpickle
 psycopg2
 pybedtools
 requests
