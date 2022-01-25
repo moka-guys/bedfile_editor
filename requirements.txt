@@ -16,6 +16,6 @@ pybedtools
 pytest-django
 pytest-env
 requests
-six=1.16.0
+six==1.16.0
 whitenoise
 pyvcf
