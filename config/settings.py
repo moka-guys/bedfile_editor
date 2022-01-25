@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'mathfilters',
     'rest_framework',
-    'django_filters',
 
     #local
     'api',
