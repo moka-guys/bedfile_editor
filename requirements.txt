@@ -1,13 +1,17 @@
+celery
 dj-database-url
 django
+django_filters
 django-crispy-forms
 django-mathfilters
 environs
 gunicorn
 markdown2
 pandas
+pickle
 psycopg2
 pybedtools
 requests
+rest_framework
 whitenoise
 pyvcf
