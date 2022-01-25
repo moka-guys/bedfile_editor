@@ -1,11 +1,11 @@
 celery
 dj-database-url
-django<=3
+django
 django-crispy-forms
-django-filter==0.15
+django-filter
 django-mathfilters
 django-on-heroku
-django-restql==0.15.1
+django-restql
 environs
 gunicorn
 markdown2
@@ -16,5 +16,6 @@ pybedtools
 pytest-django
 pytest-env
 requests
+six=1.16.0
 whitenoise
 pyvcf
