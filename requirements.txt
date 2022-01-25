@@ -16,6 +16,5 @@ pybedtools
 pytest-django
 pytest-env
 requests
-djangorestframework-filters==0.11.1
 whitenoise
 pyvcf
