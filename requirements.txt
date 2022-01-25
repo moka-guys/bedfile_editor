@@ -1,7 +1,7 @@
 celery
 dj-database-url
 django
-django_filters
+django-filter
 django-crispy-forms
 django-mathfilters
 environs
