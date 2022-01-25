@@ -14,22 +14,31 @@ from bed_maker.models import *
 #     return render(request, 'bed_maker/edit.html', {'transcripts': transcript_list})
 
 # Create your views here.
+
 def SelectBedfile(request):
     """
     Provide List of BedfileRequests
     """
-    # setup view
-    selected_form = BedfileSelectForm()
-    
-    context = {'selected_form': selected_form,}
     
     # if form is submitted
     if request.method == 'POST':
+        form = BedfileSelectForm(request.POST)
 
-        selected_form = BedfileSelectForm(request.POST)
-        if selected_form.is_valid:
-            print(selected_form)
-            cleaned_data = selected_form.cleaned_data
-            selected_bedfile_request = cleaned_data['select_bedfile_request']          
-    # render the page
-    return render(request, 'bed_maker/edit.html', context)
+        if form.is_valid():
+            try:
+                selected_bedfile_request = form.cleaned_data['select_bedfile_request'].pk    
+                gene_data_api_url = f"/api/v1/genes/?format=json&bedfile_request_id={selected_bedfile_request}"
+                print(gene_data_api_url)
+                context = {'selected_form': form, 'gene_data_api_url' : gene_data_api_url}
+                return render(request, 'bed_maker/edit.html', context)
+
+            except ValueError as e:
+                print(e)
+                context = {'selected_form': form, 'gene_data_api_url' : "/api/v1/genes/?format=json"}
+                return render(request, 'bed_maker/edit.html', context)
+        context = {'selected_form': form, 'gene_data_api_url' : "/api/v1/genes/?format=json"}
+        return render(request, 'bed_maker/edit.html', context)
+    else:
+        form = BedfileSelectForm(request.POST)
+        context = {'selected_form': form, 'gene_data_api_url' : "/api/v1/genes/?format=json"}
+        return render(request, 'bed_maker/edit.html', context)

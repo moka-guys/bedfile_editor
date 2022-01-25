@@ -1,7 +1,14 @@
 from rest_framework import serializers
-from bed_maker.models import BedfileRequest, Gene, Transcript 
+from bed_maker.models import BedfileRequest, Gene, Transcript
+from django_restql.mixins import DynamicFieldsMixin 
 
-class BedfileRequestSerializer(serializers.ModelSerializer):
+class BedfileRequestSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    
+    class Meta:
+        fields = ('bedfile_request_id', 'pan_number', 'date_requested', 'requested_by', 'request_status', 'request_transcript_padding', 'request_introns', 'request_exon_padding', 'request_five_prime_UTR', 'request_three_prime_UTR', 'request_five_prime_UTR_padding', 'request_three_prime_UTR_padding', 'panel_category', 'panel_subcategory', 'panel_name',)
+        model = BedfileRequest
+
+class BedfileRequestSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     
     class Meta:
         fields = ('bedfile_request_id', 'pan_number', 'date_requested', 'requested_by', 'request_status', 'request_transcript_padding', 'request_introns', 'request_exon_padding', 'request_five_prime_UTR', 'request_three_prime_UTR', 'request_five_prime_UTR_padding', 'request_three_prime_UTR_padding', 'panel_category', 'panel_subcategory', 'panel_name',)

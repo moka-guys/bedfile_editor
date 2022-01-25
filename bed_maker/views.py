@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from .forms import ManualUploadForm
@@ -6,9 +6,10 @@ from .forms import ManualUploadForm
 from .models import *
 import datetime
 import requests, sys
-from bed_maker.clinvar_coverage import *
+from bed_maker.externalAPIs import *
 import markdown2
 import os
+from celery import shared_task
 
 
 # Create your views here.
@@ -27,44 +28,25 @@ def view(request):
 
     return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
 
-def SelectBedfile(request):
-    """
-    Provide List of BedfileRequests
-    """
-    # setup view
-    selected_form = BedfileSelectForm()
+# def SelectBedfile(request):
+#     """
+#     Provide List of BedfileRequests
+#     """
+#     # setup view
+#     selected_form = BedfileSelectForm()
     
-    context = {'selected_form': selected_form,}
+#     context = {'selected_form': selected_form,}
     
-    # if form is submitted
-    if request.method == 'POST':
+#     # if form is submitted
+#     if request.method == 'POST':
 
-        selected_form = BedfileSelectForm(request.POST)
-        if selected_form.is_valid:
-            print(selected_form)
-            cleaned_data = selected_form.cleaned_data
-            selected_bedfile_request = cleaned_data['select_bedfile_request']          
-    # render the page
-    return render(request, 'bed_maker/edit.html', context)
-
-
-def get_clinvar_variant_summary():
-    '''Read in ClinVar data from either vcf (SLOW), or use pickled summary file if it exists'''
-    # TODO Generalise function by adding file path as args and add support for periodic running so that uptodate data is used
-    vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
-
-    if os.path.isfile(cur_path+'/Clinvar/clinvar_variant_per_gene.pkl'):
-        with open(cur_path+'/Clinvar/clinvar_variant_per_gene.pkl', 'rb') as inputfile:
-            clinvar_variant_per_gene = pickle.load(inputfile)
-        return(clinvar_variant_per_gene)
-    else:
-        # Read in ClinVar vcf
-        vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
-        clinvar_variant_per_gene = count_clinvar_SNVs_per_gene(vcfReader)
-        # Save summary ClinVar data fro faster loading next time
-        with open(cur_path+'/Clinvar/clinvar_variant_per_gene.pkl', 'wb') as outputfile:
-            pickle.dump(clinvar_variant_per_gene, outputfile)
-        return clinvar_variant_per_gene
+#         selected_form = BedfileSelectForm(request.POST)
+#         if selected_form.is_valid:
+#             print(selected_form)
+#             cleaned_data = selected_form.cleaned_data
+#             selected_bedfile_request = cleaned_data['select_bedfile_request']          
+#     # render the page
+#     return render(request, 'bed_maker/edit.html', context)
 
 def manual_import(request):
     """
@@ -73,8 +55,8 @@ def manual_import(request):
     # setup view
     import_form = ManualUploadForm()
 
-    context = {'import_form': import_form,}
-    
+    context = {'import_form': import_form, 'message' : None}
+    print(context)    
     # if form is submitted
     if request.method == 'POST':
 
@@ -86,8 +68,11 @@ def manual_import(request):
             # Get list of all MANE Selected transcripts
             MANE_list_df = get_MANE_list()
 
+            # Get clinVar data
+            vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
+
             # Get summary of ClinVar variants per gene
-            variant_count_per_gene = get_clinvar_variant_summary()
+            variant_count_per_gene = get_clinvar_variant_summary(['single_nucleotide_variant'], ['Likely_pathogenic', 'Pathogenic', 'Pathogenic/Likely_pathogenic'])
 
            # get bedfile request data - BedfileRequest is created when the users fills in
            # the Import details in the webapp creating a BedfileRequest object which is defined in models.py
@@ -123,6 +108,7 @@ def manual_import(request):
                 ensembl_id = gene_ID,
                 bedfile_request_id = bedfile_request,
                 display_name = ensembl_gene_data["display_name"],
+                # TODO check if these should be added to model
                 #y = ensembl_gene_data["biotype"],
                 #z = ensembl_gene_data["seq_region_name"],
                 )
@@ -134,8 +120,7 @@ def manual_import(request):
                     # exclude haplotypes (as not in clinvar)
                     transcript_intervals = list([ i for i in transcript_intervals if 'hap' not in i[0] ])
                     # count gene variants and update covered clinvar fraction
-                    variants = get_variants_by_interval(transcript_intervals) if transcript_intervals else []
-
+                    variants = get_variants_by_interval(transcript_intervals, ['single_nucleotide_variant'],) if transcript_intervals else []
                     transcript = Transcript.objects.create(
                     ensembl_id = tx['id'],
                     ensembl_transcript_version = tx['version'],
@@ -188,8 +173,22 @@ def manual_import(request):
                         start = tx["start"],
                         end = tx["end"],
                         )
-            # add success message to page
-            context['message'] = ['Gene list was uploaded successfully']
+            if cleaned_data["region_list"]:
+                genomic_regions = [y for y in (x.strip() for x in cleaned_data['region_list'].splitlines()) if y]
+                for genomic_region in genomic_regions:
+                    region_id, region_chr, region_start, region_end = genomic_region.split(",")
+                    genomic_range = GenomicRange.objects.create(
+                    bedfile_request_id = bedfile_request,
+                    genomic_region_id = region_id,
+                    chromosome = region_chr,
+                    start = region_start,
+                    end = region_end,
+                    )
 
+            # add success message to page
+            my_request_id = cleaned_data['pan_number']
+            context['message'] = [f'User submitted Bed File Request "{my_request_id}" was processed successfully']
+            print(context)
     # render the page
     return render(request, 'bed_maker/manual_import.html', context)
+""

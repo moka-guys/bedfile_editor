@@ -1,5 +1,5 @@
 
-/* $(document).ready(function () {
+$(document).ready(function () {
 
     $("#manual-upload-form").submit(function (e) {
         e.preventDefault();
@@ -24,7 +24,7 @@
 
 
 });
- */
+
 
 
 //$.ajax ({

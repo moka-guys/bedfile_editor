@@ -10,7 +10,7 @@ class BedfileRequest(models.Model):
     pan_number = models.CharField(max_length=10)
     date_requested = models.DateField()
     requested_by = models.CharField(max_length=20)
-    request_status = models.CharField(max_length=10, choices=(('draft', 'draft'), ('published', 'published')))
+    request_status = models.CharField(max_length=10, choices=(('draft', 'draft'), ('published', 'published'), ('deprecated', 'deprecated')))
     request_transcript_padding = models.IntegerField(default=0)
     request_introns = models.BooleanField(default=False)
     request_exon_padding = models.IntegerField(default=False)
@@ -95,7 +95,7 @@ class Exon(models.Model):
 
 class UTR(models.Model):
     """
-    Model to store exon details
+    Model to store UTR details
     """
     utr_id = models.AutoField(primary_key=True)
     # ensembl transcript ID begining ENST
@@ -109,3 +109,18 @@ class UTR(models.Model):
 
     def __str__(self):
         return f'{self.ensembl_id}'
+
+class GenomicRange(models.Model):
+    """
+    Model to store genomic ranges for user specified regions
+    """
+    genomic_range_id = models.AutoField(primary_key=True)
+    bedfile_request_id = models.ForeignKey('BedfileRequest', on_delete=models.CASCADE,)
+    # genomic range info
+    genomic_region_id=models.CharField(max_length=15)
+    chromosome=models.CharField(max_length=2)
+    start = models.CharField(max_length=50)
+    end = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'{self.genomic_region_id}'

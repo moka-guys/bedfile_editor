@@ -12,7 +12,7 @@ class BedfileSelectForm(forms.Form):
     """
     Form for selecting bedfiles
     """
-    select_bedfile_request = forms.ModelChoiceField(required=True, widget=forms.Select, queryset=BedfileRequest.objects.all())
+    select_bedfile_request = forms.ModelChoiceField(required=True, queryset=BedfileRequest.objects.all(), initial=0)
 
     def __init__(self, *args, **kwargs):
         super(BedfileSelectForm, self).__init__(*args, **kwargs)

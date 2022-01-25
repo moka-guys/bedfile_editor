@@ -31,6 +31,7 @@ def ExportBedfile(request):
             # Return selected transcripts for specified BedfileRequest
             selected_transcript_queryset = Transcript.objects.filter(selected_transcript=True, bedfile_request_id__pan_number=str(selected_bedfile_request))
             df = pd.DataFrame.from_records(selected_transcript_queryset.values())
+            #TODO Add calculations for padding
             export_df = df[['chromosome', 'start', 'end', 'ensembl_id']]
             # Define text file name
             bedfile_name = f'{str(selected_bedfile_request)}.bed'

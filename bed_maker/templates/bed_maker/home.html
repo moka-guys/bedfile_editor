@@ -1,5 +1,13 @@
 {% extends 'bed_maker/base.html' %}
 {% block content %}
+{% load static %}
+
+
+<script type="text/javascript" src="{% static "DataTables/jQuery-3.3.1/jQuery-3.3.1.min.js" %}"></script>
+<script type="text/javascript" src="{% static "DataTables/Bootstrap-4-4.1.1/js/bootstrap.min.js" %}"></script>
+<script type="text/javascript" src="{% static "DataTables/datatables.min.js" %}"></script>
+
+
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand">Homepage</a>
     </nav>
@@ -12,3 +20,4 @@
     </body>
 
     {% endblock %}
+
