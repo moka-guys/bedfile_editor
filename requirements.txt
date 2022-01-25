@@ -2,6 +2,7 @@ celery
 dj-database-url
 django<=3
 django-crispy-forms
+django-filter==0.15
 django-mathfilters
 django-on-heroku
 django-restql==0.15.1
