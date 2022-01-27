@@ -57,7 +57,7 @@ class Transcript(models.Model):
     end = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
     RefSeq_HGMD_transcript = models.BooleanField(default=False)
-    biotype = models.CharField(max_length=21, default="")
+    biotype = models.CharField(max_length=50, default="")
     coverage = models.CharField(max_length=20)
     clinvar_coverage = models.CharField(max_length=10)
     clinvar_variants = models.CharField(max_length=50)
