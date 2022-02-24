@@ -102,7 +102,6 @@ def manual_import(request):
                 ensembl_gene_data = lookup_ensembl_gene(gene_ID)
                 # Get count of all ClinVar variants for this gene
                 gene_variants_count = variant_count_per_gene[ensembl_gene_data["display_name"]]
-
                 # Populate database with transcript details for each gene using Ensembl API
                 gene = Gene.objects.create(
                 ensembl_id = gene_ID,

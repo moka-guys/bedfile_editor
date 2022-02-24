@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'mathfilters',
     'rest_framework',
+    'django_extensions',
 
     #local
     'api',
@@ -169,4 +170,4 @@ REST_FRAMEWORK = {
 
 # Configure Django App for Heroku.
 import django_on_heroku
-django_on_heroku.settings(locals())
+#django_on_heroku.settings(locals())

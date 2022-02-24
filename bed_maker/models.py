@@ -1,4 +1,8 @@
+from unicodedata import name
 from django.db import models
+from importlib_metadata import version
+import textwrap
+import re
 
 # Create your models here.
 
@@ -124,3 +128,37 @@ class GenomicRange(models.Model):
 
     def __str__(self):
         return f'{self.genomic_region_id}'
+
+class PanelAppList(models.Model):
+    """
+    Model to Panel App Panel Details
+    """
+    Panel_app_id = models.AutoField(primary_key=True)
+    id = models.CharField(max_length=10)
+    name = models.CharField(max_length=100)
+    hash_id = models.CharField(max_length=25)
+    version = models.CharField(max_length=11)
+    disease_sub_group = models.CharField(max_length=50)
+    relevant_disorders = models.CharField(max_length=100)
+    signed_off = models.DateField()
+    number_of_genes = models.IntegerField()
+    number_of_regions = models.IntegerField()
+
+    def __str__(self):
+        # Clean up relevant_orders to return only R number/s
+        r = re.compile("R[0-9]+")
+        readable_description = f'{", ".join(re.findall(r, self.relevant_disorders))}, {self.name}'
+        readable_description = readable_description.strip(', ')
+        return readable_description
+
+class HGNC2ensembl(models.Model):
+    """
+    Model to Panel App Panel Details
+    """
+    id = models.AutoField(primary_key=True)
+    HGNC_id = models.CharField(max_length=10)
+    HGNC_symbol = models.CharField(max_length=10)
+    ensembl_id = models.CharField(max_length=25)
+
+    def __str__(self):
+        return f'{self.HGNC_id}, {self.HGNC_symbol}, {self.ensembl_id}'
