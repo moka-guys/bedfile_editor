@@ -43,7 +43,7 @@ class ManualUploadForm(forms.Form):
                                                     label=('Select panels'),
                                                     required=False,
                                                     widget=FilteredSelectMultiple(
-                                                        ("name"),
+                                                        ("Panels"),
                                                         is_stacked=True) # TODO figure out why unstacked doesn't work in  
                                                     )
 

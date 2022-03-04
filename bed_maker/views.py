@@ -93,10 +93,31 @@ def manual_import(request):
                 panel_name = cleaned_data['panel_name'],
             )
             # Use the TARK API to get most recent version of the MANE transcript list
+
+
             # Get Gene list - Gene objects is defined in models.py - it populates the data into the 
             # genes table for every BedfileRequest made.
-            # List comprehension to split lines input by user into a list and trim any white space
-            gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
+            
+            if cleaned_data['gene_id_type'] == 'HGNC_ID':
+                # List comprehension to split lines input by user into a list and trim any white space
+                HGNC_ID_gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
+                # Convert HGNC symbol into Ensembl ID]
+                gene_list = list(HGNC2ensembl.objects.filter(HGNC_id__in=HGNC_ID_gene_list).values_list('ensembl_id', flat=True)) 
+                # TODO Handle NaN values where Ensembl ID does not exist
+            elif cleaned_data['gene_id_type'] == 'HGNC_Symbol':
+                # List comprehension to split lines input by user into a list and trim any white space
+                HGNC_Symbol_gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]
+                # Convert HGNC symbol into Ensembl ID
+                gene_list = list(HGNC2ensembl.objects.filter(HGNC_symbol__in=HGNC_Symbol_gene_list).values_list('ensembl_id', flat=True))
+                # TODO Handle NaN values where Ensembl ID does not exist
+            elif cleaned_data['gene_id_type'] == 'Ensembl_ID':
+                # List comprehension to split lines input by user into a list and trim any white space
+                gene_list = [y for y in (x.strip() for x in cleaned_data['gene_list'].splitlines()) if y]                
+            else:
+                pass # TODO add code to handle error + logging error
+            
+            if cleaned_data['panel_app_data']:
+                print(list(cleaned_data['panel_app_data']))
             for gene_ID in gene_list:
                 # Get data from ensembl
                 ensembl_gene_data = lookup_ensembl_gene(gene_ID)
