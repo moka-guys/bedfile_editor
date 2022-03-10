@@ -59,13 +59,10 @@ class Transcript(models.Model):
     display_name = models.CharField(max_length=15)
     start = models.CharField(max_length=50)
     end = models.CharField(max_length=50)
+    coverage = models.CharField(max_length=50)
     MANE_transcript = models.BooleanField()
     RefSeq_HGMD_transcript = models.BooleanField(default=False)
     biotype = models.CharField(max_length=50, default="")
-    coverage = models.CharField(max_length=20)
-    clinvar_coverage = models.CharField(max_length=10)
-    clinvar_variants = models.CharField(max_length=50)
-    clinvar_details = models.CharField(max_length=50)
     recommended_transcript = models.BooleanField(default=False)
     selected_transcript = models.BooleanField(default=False)
     transcript_padding = models.IntegerField(default=0)
@@ -162,3 +159,14 @@ class HGNC2ensembl(models.Model):
 
     def __str__(self):
         return f'{self.HGNC_id}, {self.HGNC_symbol}, {self.ensembl_id}'
+
+class ClinvarCoverage(models.Model):
+    """
+    Model to Clinvar Coverage
+    """
+    transcript_ensembl_id = models.CharField(max_length=15)
+    clinvar_coverage_fraction = models.CharField(max_length=20)
+    clinvar_variants = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'{self.transcript_ensembl_id}'

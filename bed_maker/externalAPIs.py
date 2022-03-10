@@ -6,13 +6,18 @@ import pickle
 from collections import Counter
 from config.settings import BASE_DIR
 import io
+import shutil
+import re
+from bed_maker.models import ClinvarCoverage
+import ijson
+import json
 
 cur_path = BASE_DIR
 
 '''
 Get path to Clinvar folder to calculate Clinvar Coverage
 '''
-# TODO check if this function is actially used
+# This function is used to download files
 def download(url: str, dest_folder: str):
     '''
     Download function for Clinvar vcf files if not already present
@@ -35,21 +40,42 @@ def download(url: str, dest_folder: str):
     else:  # HTTP status code 4XX/5XX
         print("Download failed: status code {}\n{}".format(r.status_code, r.text))
 
-if os.path.exists(cur_path + '/Clinvar'):
-    pass
-else:
+def download_Clinvar_data():
+    if os.path.exists(cur_path + '/Clinvar'):
+        shutil.rmtree(cur_path + '/Clinvar')
     os.mkdir(cur_path + '/Clinvar')
-
-if os.path.exists(cur_path + '/Clinvar/clinvar.vcf.gz'):
-    pass
-else: 
     download("https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz", dest_folder=cur_path+"/Clinvar")
-if os.path.exists(cur_path + '/Clinvar/clinvar.vcf.gz.tbi'):
-    pass
-else:
     download("https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz.tbi", dest_folder=cur_path+"/Clinvar")
+    download("http://ftp.ensembl.org/pub/release-105/tsv/homo_sapiens/Homo_sapiens.GRCh38.105.canonical.tsv.gz", dest_folder=cur_path+"/Clinvar")
 
 
+def download_ensembl_annotations():
+    '''
+    Download gene information from ensembl as a json file
+    '''
+    if os.path.exists(cur_path + '/Ensembl'):
+        shutil.rmtree(cur_path + '/Ensembl')
+    os.mkdir(cur_path + '/Ensembl')
+    download("http://ftp.ensembl.org/pub/release-105/json/homo_sapiens/homo_sapiens.json", dest_folder=cur_path+"/Ensembl")
+    my_dict = {}
+    myfile = open(cur_path + '/Ensembl/filtered_data.json', 'w')
+    with open(cur_path + '/Ensembl/homo_sapiens.json', 'r') as f:
+        parse_events = ijson.parse(f, use_float=True)
+        for  obj in ijson.items(parse_events, 'genes.item'):
+            names = []
+            if 'name' in obj:
+                names.append(obj['name'])
+            else: 
+                names.append('')    
+            trans = []
+            for tx in obj['transcripts']:
+                my_dict2 = {'id': tx['id'], 'exons': tx['exons']}
+                trans.append(my_dict2) 
+            my_dict[obj['id']] = { 'name' : names, 'transcripts': trans }
+
+    with open(cur_path + '/Ensembl/filtered_data.json', 'w') as fp:
+        json.dump(my_dict, fp,  indent=4)
+    
 
 def get_MANE_list():
     '''
@@ -121,7 +147,7 @@ def get_transcript_intervals(transcript):
     :rtype: list of tuples 
     '''
     intervals = []
-    for Exon in transcript['Exon']:
+    for Exon in transcript['exons']:
         chr = Exon['seq_region_name']
         start = Exon['start']
         end = Exon['end']
@@ -162,7 +188,6 @@ def count_clinvar_variants_per_interval(variant_type=['All'], clinical_significa
 def get_clinvar_variant_summary(variant_type=['All'], clinical_significance=['All']):
     '''Read in ClinVar data from either vcf (SLOW), or use previously pickled summary file if it exists'''
     # TODO Generalise function by adding file path as args and add support for periodic running so that uptodate data is used, chck if vcfReader should be passed as arg
-    cur_path = BASE_DIR
     # Check whether there is a cached summary that can be used
     if os.path.isfile(cur_path+'/Clinvar/clinvar_variant_per_gene.pkl'):
         with open(cur_path+'/Clinvar/clinvar_variant_per_gene.pkl', 'rb') as inputfile:
@@ -220,34 +245,67 @@ def get_variants_by_interval(intervals, variant_type=['All'], clinical_significa
     :return: List of variants
     :rtype: list
     '''
-    cur_path = BASE_DIR
     vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
     result = set()
     for interval in intervals:
+        print(interval)
         chrom, start, end = interval
-        for record in vcfReader.fetch(chrom,start,end):
-            if variant_type == ['All'] and clinical_significance == ['All']:
-               result.add(record.ID)
-            elif variant_type == ['All']:
-            # Filter only on clinical significance
-                if record.INFO['CLNSIG'] in clinical_significance:
+        try:
+            for record in vcfReader.fetch(chrom,int(start),int(end)):
+                if variant_type == ['All'] and clinical_significance == ['All']:
                     result.add(record.ID)
-            elif clinical_significance == ['All']:
-                # Filter only on variant type
-                if record.INFO['CLNVC'] in variant_type:
-                    result.add(record.ID)
-            else:
-                # Filter on both variant type and clinical significance
-                if record.INFO['CLNVC'] in variant_type and record.INFO['CLNSIG'] in clinical_significance :
-                    result.add(record.ID)
+                elif variant_type == ['All']:
+                # Filter only on clinical significance
+                    if record.INFO['CLNSIG'] in clinical_significance:
+                        result.add(record.ID)
+                elif clinical_significance == ['All']:
+                    # Filter only on variant type
+                    if record.INFO['CLNVC'] in variant_type:
+                        result.add(record.ID)
+                else:
+                    # Filter on both variant type and clinical significance
+                    if record.INFO['CLNVC'] in variant_type and record.INFO['CLNSIG'] in clinical_significance :
+                        result.add(record.ID)
+        except:
+            result.add(0)
     return list(result)
+
 
 def calculate_clinvar_coverage_for_all_ensembl_transcripts():
     '''
     Pre-calculate the clinvar coverage for all Ensembl transcripts 
-    # TODO Elaborate
     '''
-    pass
+    ClinvarCoverage.objects.all().delete()
+    variant_count_per_gene = get_clinvar_variant_summary(['single_nucleotide_variant'])
+    ensembl_Genes = pd.read_csv(cur_path+'/Clinvar/Homo_sapiens.GRCh38.105.canonical.tsv.gz', sep='\t', compression='gzip',  engine='python')
+    jdata =  json.load(open(cur_path + '/Ensembl/filtered_data.json'))
+    pattern = re.compile(r"^(\S+)\.")
+    for i in range(0, len(ensembl_Genes)):
+        full_gene_name  = pattern.search(ensembl_Genes['gene_stable_id'][i])[1]
+        gene_data = jdata[full_gene_name]
+        gene_variants_count = variant_count_per_gene[gene_data["name"][0]]
+        for transcript in gene_data['transcripts']:
+            transcript_intervals = get_transcript_intervals(transcript)
+            try:
+                variants = get_variants_by_interval(transcript_intervals, ['single_nucleotide_variant'],) if transcript_intervals else []
+                print(variants)
+                print(gene_variants_count)
+                clinvar_coverage_fraction = round((len(variants)/gene_variants_count),10) if gene_variants_count else None, 
+                clinvar_variants = len(variants) if variants else None,
+            except:
+                variants = 'NoInfo'
+                clinvar_coverage_fraction = 'NoInfo'
+                clinvar_variants = 'NoInfo'
+            print(transcript['id'])
+            print(clinvar_coverage_fraction[0]) 
+            print(clinvar_variants[0])    
+            ClinvarData = ClinvarCoverage.objects.get_or_create(
+                transcript_ensembl_id = transcript['id'],
+                clinvar_variants = clinvar_variants[0],
+                clinvar_coverage_fraction = clinvar_coverage_fraction[0],
+            )
+
+
 
 def prioritise_transcripts(gene_id):
     '''

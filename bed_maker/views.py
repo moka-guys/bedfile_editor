@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from .forms import ManualUploadForm
+from django.db import connection
+import sqlite3 
 
 from .models import *
 import datetime
@@ -24,9 +26,10 @@ def view(request):
     """
     View a list of transcripts
     """
-    transcript_list = Transcript.objects.all()
+    context =  {}
+    context['transcripts'] = Transcript.objects.all()
 
-    return render(request, 'bed_maker/view.html', {'transcripts': transcript_list})
+    return render(request, 'bed_maker/view.html', context)
 
 # def SelectBedfile(request):
 #     """
@@ -68,12 +71,6 @@ def manual_import(request):
             # Get list of all MANE Selected transcripts
             MANE_list_df = get_MANE_list()
 
-            # Get clinVar data
-            vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
-
-            # Get summary of ClinVar variants per gene
-            variant_count_per_gene = get_clinvar_variant_summary(['single_nucleotide_variant'], ['Likely_pathogenic', 'Pathogenic', 'Pathogenic/Likely_pathogenic'])
-
            # get bedfile request data - BedfileRequest is created when the users fills in
            # the Import details in the webapp creating a BedfileRequest object which is defined in models.py
             bedfile_request, created = BedfileRequest.objects.get_or_create(
@@ -100,8 +97,6 @@ def manual_import(request):
             for gene_ID in gene_list:
                 # Get data from ensembl
                 ensembl_gene_data = lookup_ensembl_gene(gene_ID)
-                # Get count of all ClinVar variants for this gene
-                gene_variants_count = variant_count_per_gene[ensembl_gene_data["display_name"]]
                 # Populate database with transcript details for each gene using Ensembl API
                 gene = Gene.objects.create(
                 ensembl_id = gene_ID,
@@ -113,13 +108,7 @@ def manual_import(request):
                 )
                 # Get Transcript level data
                 for tx in ensembl_gene_data["Transcript"]:
-
-                    # Get ClinVar data & calculate coverage
-                    transcript_intervals = get_transcript_intervals(tx)
-                    # exclude haplotypes (as not in clinvar)
-                    transcript_intervals = list([ i for i in transcript_intervals if 'hap' not in i[0] ])
                     # count gene variants and update covered clinvar fraction
-                    variants = get_variants_by_interval(transcript_intervals, ['single_nucleotide_variant'],) if transcript_intervals else []
                     transcript = Transcript.objects.create(
                     ensembl_id = tx['id'],
                     ensembl_transcript_version = tx['version'],
@@ -130,13 +119,11 @@ def manual_import(request):
                     start = tx["start"],
                     end = tx["end"],
                     biotype = tx["biotype"],
+                    coverage = ClinvarCoverage.objects.filter(transcript_ensembl_id=tx['id']).get().clinvar_coverage_fraction,
                     # TODO Simplify dataframe to faster data structure
                     MANE_transcript = 'True' if tx["id"] in MANE_list_df.ens_stable_id.values else 'False',
                     RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == tx["id"]]['refseq_stable_id'].item() if tx["id"] in MANE_list_df.ens_stable_id.values else '',
                     RefSeq_transcript_version = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == tx["id"]]['refseq_stable_id_version'].item() if tx["id"] in MANE_list_df.ens_stable_id.values else '',
-                    coverage = len(variants)/gene_variants_count if gene_variants_count else None, #TODO Duplicate consider removing
-                    clinvar_coverage = round((len(variants)/gene_variants_count), 4) if gene_variants_count else None,
-                    clinvar_variants = len(variants) if variants else None,
                     # All other setting initialised as per bedfile global settings 
                     # transcript_padding = cleaned_data['request_transcript_padding'],
                     include_introns = cleaned_data['request_introns'],
