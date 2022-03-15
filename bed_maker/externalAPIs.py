@@ -6,13 +6,18 @@ import pickle
 from collections import Counter
 from config.settings import BASE_DIR
 import io
+import shutil
+import re
+from bed_maker.models import ClinvarCoverage
+import ijson
+import json
 
 cur_path = BASE_DIR
 
 '''
 Get path to Clinvar folder to calculate Clinvar Coverage
 '''
-# TODO check if this function is actially used
+
 def download(url: str, dest_folder: str):
     '''
     Download function for Clinvar vcf files if not already present
@@ -218,7 +223,7 @@ def get_variants_by_interval(intervals, variant_type=['All'], clinical_significa
     :para clinical_significance: List of clinical significance terms to include in output, if omitted all results returned, Examples include 'Benign', 'Benign/Likely_benign', 'Likely_benign', 'Likely_pathogenic', 'Pathogenic', 'Pathogenic/Likely_pathogenic', 'Uncertain_significance' - for a full list look at the VCF
     :type clinical_significance:
     :return: List of variants
-    :rtype: list
+    :r
     '''
     cur_path = BASE_DIR
     vcfReader = vcf.Reader(filename=cur_path+'/Clinvar/clinvar.vcf.gz', compressed=True,  encoding="utf-8")
@@ -310,9 +315,27 @@ def get_panel_app_list():
 
     return(GEL_panel_app_df)
 
-def get_panel_app_genes(panel_id):
-    print(f"https://panelapp.genomicsengland.co.uk/WebServices/get_panel/{panel_id}/?format=json")
+def get_panel_app_genes(panel_id, panel_version, genome_build):
+    print(f"https://panelapp.genomicsengland.co.uk/api/v1/panels/{panel_id}/genes/?version={panel_version}")
+    
+def get_dbSNP_id_region(dbSNP_id, genome_build):
+    '''
+    Get the genomic co-ordinates for the dbSNP ID requested
+    '''
+    # curl -X 'GET' 'https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/268' -H 'accept: application/json' | jq '.primary_snapshot_data.ga4gh'
+    server = "https://api.ncbi.nlm.nih.gov"
 
+    ext = f"variation/v0/refsnp/{dbSNP_id}/"
+    r = requests.get(server+ext, headers={ "Content-Type" : "application/json" })
+
+    # Send informative error message if bad request returned 
+    if not r.ok:
+        r.raise_for_status()
+        sys.exit()
+
+    decoded = r.json()
+
+    return decoded
 
 def get_HGNC_data(): 
     '''

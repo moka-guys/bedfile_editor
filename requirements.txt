@@ -19,3 +19,7 @@ requests
 six==1.16.0
 whitenoise
 pyvcf
+shutil
+re
+json
+ijson
