@@ -108,6 +108,10 @@ def manual_import(request):
                 )
                 # Get Transcript level data
                 for tx in ensembl_gene_data["Transcript"]:
+                    try:
+                        _coverage = ClinvarCoverage_grch37.objects.filter(transcript_ensembl_id=tx['id']).get().clinvar_coverage_fraction,
+                    except:
+                        _coverage = ''
                     # count gene variants and update covered clinvar fraction
                     transcript = Transcript.objects.create(
                     ensembl_id = tx['id'],
@@ -119,7 +123,7 @@ def manual_import(request):
                     start = tx["start"],
                     end = tx["end"],
                     biotype = tx["biotype"],
-                    coverage = ClinvarCoverage.objects.filter(transcript_ensembl_id=tx['id']).get().clinvar_coverage_fraction,
+                    coverage = _coverage,
                     # TODO Simplify dataframe to faster data structure
                     MANE_transcript = 'True' if tx["id"] in MANE_list_df.ens_stable_id.values else 'False',
                     RefSeq_transcript_id = MANE_list_df.loc[MANE_list_df['ens_stable_id'] == tx["id"]]['refseq_stable_id'].item() if tx["id"] in MANE_list_df.ens_stable_id.values else '',

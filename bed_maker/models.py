@@ -160,13 +160,24 @@ class HGNC2ensembl(models.Model):
     def __str__(self):
         return f'{self.HGNC_id}, {self.HGNC_symbol}, {self.ensembl_id}'
 
-class ClinvarCoverage(models.Model):
+class ClinvarCoverage_grch37(models.Model):
     """
     Model to Clinvar Coverage
     """
     transcript_ensembl_id = models.CharField(max_length=15)
     clinvar_coverage_fraction = models.CharField(max_length=20)
     clinvar_variants = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'{self.transcript_ensembl_id}'
+
+class ClinvarCoverage_grch38(models.Model):
+    """
+    Model to Clinvar Coverage
+    """
+    transcript_ensembl_id = models.CharField(max_length=15)
+    clinvar_coverage_fraction = models.CharField(max_length=20, null=True)
+    clinvar_variants = models.CharField(max_length=50, null=True)
 
     def __str__(self):
         return f'{self.transcript_ensembl_id}'
